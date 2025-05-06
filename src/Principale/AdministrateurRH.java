@@ -1,12 +1,11 @@
 package Principale;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class AdministrateurRH {
     private String jourDeRotation;
     private List<Agent> agents;
-    private List<JourFerie> joursFeries;
+    private final List<JourFerie> joursFeries;
 
     public AdministrateurRH(String jourDeRotation) {
         this.jourDeRotation = jourDeRotation;
