@@ -1,5 +1,5 @@
 package Principale;
 
-public class AdministrateurRH {
+public class  AdministrateurRH {
     //partie de Simpara
 }
