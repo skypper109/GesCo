@@ -7,6 +7,7 @@ public class Indisponibilte {
     private int idAgant;
     private String motif;
     private LocalDate dateIdisponible;
+
     Indisponibilte(int idAgent, String motif, LocalDate dateIndisponible)
     {
         this.idAgant= idAgent;
