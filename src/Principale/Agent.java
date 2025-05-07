@@ -11,6 +11,8 @@ import java.util.List;
         private String nom;
         private String prenom;
         private String email;
+
+        public List<Indisponibilite> indisponibiliteList;
         //constructeur
 
         public Agent(int idAgent, String nom, String prenom, String email) {
@@ -52,8 +54,25 @@ import java.util.List;
         public void setEmail(String email) {
             this.email = email;
         }
+
+
+        //Pour la methode de l'agent est indisponible :
+        public boolean estDisponible(LocalDate date){
+            return !indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel();
+        }
+
+        //La methode Pour l'indisponibilité :
+        public boolean ajoutIndisponible(String motif,LocalDate date){
+            if (!indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel()){
+                Indisponibilite indispo = new Indisponibilite(motif,date);
+                indisponibiliteList.add(indispo);
+                return true;
+            }
+            return false;
+        }
+
         public void voirTourProchaine(AdministrateurRH admin) {
-            List<Historique> historiques = admin.getHistorique();
+
             boolean trouve = false;
 
         }
