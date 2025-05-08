@@ -1,6 +1,7 @@
 package Principale;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 //La partie de MAmoutou
@@ -52,11 +53,32 @@ import java.util.List;
         public void setEmail(String email) {
             this.email = email;
         }
-        public void voirTourProchaine(AdministrateurRH admin) {
-            List<Historique> historiques = admin.getHistorique();
-            boolean trouve = false;
 
+//methode voir prochaine tour
+    public List<Historique> voirTourProchaine() {
+        List<Historique> historiques = Historique.getHistorique();
+        List<Historique> prochainesTours = new ArrayList<>();
+        for (Historique h : historiques) {
+            if (!h.isEstPasse()) { // Si le tour n’est pas passé
+                prochainesTours.add(h);
+            }
         }
+        return prochainesTours;
     }
+
+    //methode voir historique
+    public List<Historique> voirHistorique() {
+        List<Historique> historiques = Historique.getHistorique();
+        List<Historique> historiquesPasse = new ArrayList<>();
+        for (Historique h : historiques) {
+            if (h.isEstPasse()) {
+                historiquesPasse.add(h);
+            }
+        }
+        return historiquesPasse;
+    }
+
+
+}
 
 
