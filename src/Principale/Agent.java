@@ -1,7 +1,6 @@
 package Principale;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 //La partie de MAmoutou
@@ -12,6 +11,9 @@ import java.util.List;
         private String nom;
         private String prenom;
         private String email;
+        public AdministrateurRH admin;
+
+        public List<Indisponibilite> indisponibiliteList;
         //constructeur
 
         public Agent(int idAgent, String nom, String prenom, String email) {
@@ -54,31 +56,30 @@ import java.util.List;
             this.email = email;
         }
 
-//methode voir prochaine tour
-    public List<Historique> voirTourProchaine() {
-        List<Historique> historiques = Historique.getHistorique();
-        List<Historique> prochainesTours = new ArrayList<>();
-        for (Historique h : historiques) {
-            if (!h.isEstPasse()) { // Si le tour n’est pas passé
-                prochainesTours.add(h);
-            }
+
+        //Pour la methode de l'agent est indisponible :
+        public boolean estDisponible(LocalDate date){
+            return !indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel();
         }
-        return prochainesTours;
-    }
 
-    //methode voir historique
-    public List<Historique> voirHistorique() {
-        List<Historique> historiques = Historique.getHistorique();
-        List<Historique> historiquesPasse = new ArrayList<>();
-        for (Historique h : historiques) {
-            if (h.isEstPasse()) {
-                historiquesPasse.add(h);
+        //La methode Pour l'indisponibilité :
+        public boolean ajoutIndisponible(String motif,LocalDate date){
+            if (!indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel()){
+                Indisponibilite indispo = new Indisponibilite(motif,date);
+                indisponibiliteList.add(indispo);
+                return true;
             }
+            return false;
         }
-        return historiquesPasse;
+
+        public Historique voirTourProchaine(int idAgent) {
+            for (Historique h: admin.historiqueList){
+                if (h.getIdAgent() == idAgent && h.getDateRotation().isAfter(LocalDate.now())){
+                    return h;
+                }
+            }
+            return null;
+        }
     }
-
-
-}
 
 

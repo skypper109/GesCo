@@ -1,29 +1,40 @@
 package Principale;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 public class Historique {
-    private String tour;
+    //La partie de Djire Historique :
+    private int idAgent;
+    private LocalDate dateRotation;
+    private String statut;
+    private String motif;
+    private int idAgentRemp;
 
-    public Historique(String tour) {
-        this.tour = tour;
+    public Historique(int idAgent, LocalDate dateRotation, String statut, String motif, int idAgentRemp) {
+        this.idAgent = idAgent;
+        this.dateRotation = dateRotation;
+        this.statut = statut;
+        this.motif = motif;
+        this.idAgentRemp = idAgentRemp;
     }
 
-    public String getTour() {
-        return tour;
+    public int getIdAgent() {
+        return idAgent;
     }
 
-    // Simuler une base de données
-    public static List<Historique> getHistorique() {
-        List<Historique> list = new ArrayList<>();
-        list.add(new Historique("Tour 1 : Joueur A"));
-        list.add(new Historique("Tour 2 : Joueur B"));
-        list.add(new Historique("Tour 3 : Joueur C"));
-        return list;
+    public LocalDate getDateRotation() {
+        return dateRotation;
     }
 
-    public boolean isEstPasse() {
+    public String getStatut() {
+        return statut;
+    }
 
+    public String getMotif() {
+        return motif;
+    }
+
+    public int getIdAgentRemp() {
+        return idAgentRemp;
     }
 }
