@@ -11,7 +11,7 @@ import java.util.List;
         private String nom;
         private String prenom;
         private String email;
-
+        public AdministrateurRH admin;
         public List<Indisponibilite> indisponibiliteList;
         //constructeur
 
@@ -70,11 +70,22 @@ import java.util.List;
             }
             return false;
         }
-
-        public void voirTourProchaine(AdministrateurRH admin) {
-
-            boolean trouve = false;
-
+    // methode voir tour prochaine
+        public Historique voirTourProchaine(int idAgent) {
+            for (Historique h: admin.historiqueList){
+                if (h.getIdAgent() == idAgent && h.getDateRotation().isAfter(LocalDate.now())){
+                    return h;
+                }
+            }
+            return null;
+        }
+        // methode voir historique
+        public void voirHistorique(int idAgent) {
+            for (Historique h : admin.historiqueList) {
+                if (h.getIdAgent() == idAgent || h.getIdAgentRemp() == idAgent) {
+                    System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
+                }
+            }
         }
     }
 
