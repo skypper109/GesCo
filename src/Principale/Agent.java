@@ -56,26 +56,7 @@ import java.util.List;
         }
 
 
-        //Pour la methode de l'agent est indisponible :
-        public boolean estDisponible(LocalDate date){
-            return !indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel();
-        }
 
-        //La methode Pour l'indisponibilité :
-        public boolean ajoutIndisponible(String motif,LocalDate date){
-            if (!indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel()){
-                Indisponibilite indispo = new Indisponibilite(motif,date);
-                indisponibiliteList.add(indispo);
-                return true;
-            }
-            return false;
-        }
-
-        public void voirTourProchaine(AdministrateurRH admin) {
-
-            boolean trouve = false;
-
-        }
     }
 
 

@@ -18,20 +18,5 @@ public class User {
         this.role = role;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean authentifier(String username, String password){
-        for(User user:userList){
-            if (user.username.equals(username) && user.password.equals(password)){
-                return true;
-            }
-        }
-        return false;
-    }
 }
