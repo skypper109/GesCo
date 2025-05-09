@@ -62,7 +62,33 @@ public class AdministrateurRH {
         return false;
     }
 
+    //Pour Trouver la prochaine date de rotation:
+    public LocalDate prochaineDateRotation(LocalDate ref){
+        LocalDate date = ref.with(TemporalAdjusters.nextOrSame(jourRotation));
+        while (jourFerieList.stream().filter(jourFerie -> jourFerie.getDateJourFerie().equals(date)).isParallel()){
+            do {
+                date.plusWeeks(1);
+            } while (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY);
+        }
+        return date;
+    }
 
+    //Pour la mathode de Recherche de l'agent disponible :
+    public Agent trouveAgentDisponible(LocalDate date){
+        int tentative = 0;
+        int position = positionActuelle;
+        while (tentative < agentList.size()){
+            Agent agent = agentList.get(position);
+            if (agent.estDisponible(date)){
+                return agent;
+            }else {
+                position = (position+1) % agentList.size();
+                tentative++;
+            }
+
+        }
+        return null;
+    }
 }
 
 
