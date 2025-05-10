@@ -17,4 +17,44 @@ public class Historique {
         this.motif = motif;
         this.idAgentRemp = idAgentRemp;
     }
+
+    public int getIdAgent() {
+        return idAgent;
+    }
+
+    public LocalDate getDateRotation() {
+        return dateRotation;
+    }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public String getMotif() {
+        return motif;
+    }
+
+    public int getIdAgentRemp() {
+        return idAgentRemp;
+    }
+
+    public void setIdAgent(int idAgent) {
+        this.idAgent = idAgent;
+    }
+
+    public void setDateRotation(LocalDate dateRotation) {
+        this.dateRotation = dateRotation;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
+
+    public void setMotif(String motif) {
+        this.motif = motif;
+    }
+
+    public void setIdAgentRemp(int idAgentRemp) {
+        this.idAgentRemp = idAgentRemp;
+    }
 }
