@@ -1,6 +1,7 @@
 package Principale;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 //La partie de MAmoutou
@@ -20,6 +21,7 @@ import java.util.List;
             this.nom = nom;
             this.prenom = prenom;
             this.email = email;
+            this.indisponibiliteList = new ArrayList<>();
         }
 
         //getter idAgent
@@ -64,7 +66,7 @@ import java.util.List;
         //La methode Pour l'indisponibilité :
         public boolean ajoutIndisponible(String motif,LocalDate date){
             if (!indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel()){
-                Indisponibilite indispo = new Indisponibilite(motif,date);
+                Indisponibilite indispo = new Indisponibilite(getIdAgent(),motif,date);
                 indisponibiliteList.add(indispo);
                 return true;
             }
