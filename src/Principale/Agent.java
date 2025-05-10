@@ -56,7 +56,7 @@ import java.util.List;
         }
 
 
-        //Pour la methode de l'agent est indisponible :
+        //Pour la methode de l'agent est disponible :
         public boolean estDisponible(LocalDate date){
             return !indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel();
         }
