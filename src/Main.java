@@ -1,12 +1,10 @@
 import Principale.AdministrateurRH;
 import Principale.User;
-import View.EspaceAgent;
 import View.GestionAdmin;
 import View.GestionAgent;
 
 import java.io.PrintStream;
 import java.time.DayOfWeek;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -39,34 +37,20 @@ public class Main {
                     }
 
                     if (role.equals("Agent")){
-                        new EspaceAgent(user,username);
                         tentative=0;
                     }else {
                         GestionAdmin admin = new GestionAdmin(user);
                         ss.println("--------------Bienvenue Admin du systeme !!!----------------------");
                         do {
                             System.out.println("1.) Tapez 1 pour la gestion des agents");
-                            System.out.println("2.) Tapez 2 pour la gestion de rotation et de jour");
-                            System.out.println("0.) Tapez 0 pour se deconnecter");
                             int choix = admin.lireEntier("\nFaites un choix : ");
 
                             switch (choix) {
                                 case 1:
                                     new GestionAgent(user);
                                     break;
-
-                                case 2:
-                                    admin.afficherMenu();
-                                    break;
-
-                                case 0:
-                                    connect = false;
-                                    ss.println("Deconnecter...");
-                                    tentative=3;
-                                    break;
-
                                 default:
-                                    System.out.println("Choix invalide, veuillez réessayer.");
+                                    ss.println("Choix invalide, veuillez réessayer.");
                             }
                         }while (connect);
                     }

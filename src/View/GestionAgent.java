@@ -13,7 +13,6 @@ public class GestionAgent {
     private final AdministrateurRH admin;
     private final Scanner sc= new Scanner(System.in);
     public GestionAgent(AdministrateurRH admin){
-        this.date = admin.getJourRotation();
         this.admin = admin;
         this.choix();
     }
@@ -41,8 +40,6 @@ public class GestionAgent {
             System.out.println("1. ➕ Ajouter un agent");
             System.out.println("2. 📄 Lister les agents");
             System.out.println("3. 🗑️ Supprimer un agent");
-            System.out.println("0. 🔙 Retour au menu principal");
-
             choix = lireEntier();
 
             switch (choix) {
@@ -80,12 +77,7 @@ public class GestionAgent {
         }
 
         System.out.println(nbAgent + (nbAgent > 1 ? " agents ont été ajoutés avec succès !" : " agent a été ajouté avec succès !"));
-        System.out.println("Voulez vous faire une rotation Automatique en fonction de la date d'aujourd'hui (Oui/Non) ?");
-        String reponse = sc.next();
-        if (reponse.equals("oui")||reponse.equals("OUI") || reponse.equals("Oui")){
-            admin.planifieRotation(LocalDate.now());
-        }
-        this.pause();
+
     }
 
     private void listAgent(){
