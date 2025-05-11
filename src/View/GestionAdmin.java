@@ -47,20 +47,21 @@ public class GestionAdmin {
 
     private void changerJourRotation() {
         System.out.println("\n🔁 Choisissez le nouveau jour de rotation :");
-        for (int i = 1; i <= 5; i++) {
-            System.out.println(i + ". " + DayOfWeek.of(i));
-        }
+        int jour;
+        do{
+            System.out.println("1.) Tapez 1 pour Lundi");
+            System.out.println("2.) Tapez 2 pour Mardi");
+            System.out.println("3.) Tapez 3 pour Mercredi");
+            System.out.println("4.) Tapez 4 pour Jeudi");
+            System.out.println("5.) Tapez 5 pour Vendredi");
+            jour =  lireEntier("Votre choix (1-5) : ");
 
-        int jour = lireEntier("Votre choix (1-5) : ");
-        if (jour < 1 || jour > 5) {
-            System.out.println("❌ Jour invalide.");
-            return;
-        }
+        }while (jour >5 || jour ==0);
 
         DayOfWeek nouveauJour = DayOfWeek.of(jour);
         admin.setJourRotation(nouveauJour);
         System.out.println("✅ Nouveau jour de rotation défini : " + nouveauJour);
-        admin.planifieRotation(LocalDate.now());
+        admin.planifierRotationAuto();
         pause();
     }
 
@@ -76,9 +77,10 @@ public class GestionAdmin {
         String dateStr = sc.next();
         try {
             LocalDate jourFerie = LocalDate.parse(dateStr);
-            admin.ajoutJourFerie(jourFerie,null)
-            ;
-            System.out.println("✅ Jour férié ajouté : " + jourFerie);
+            System.out.print("Entrez le motif pour la date du jour férié ("+jourFerie+") : ");
+            String desc = sc.nextLine();
+            admin.ajoutJourFerie(jourFerie,desc);
+            System.out.println("✅ Jour férié ajouté : " + jourFerie + " C'est le jour de : "+desc);
         } catch (Exception e) {
             System.out.println("❌ Format de date invalide. Veuillez réessayer.");
         }

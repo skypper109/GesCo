@@ -14,4 +14,8 @@ public class JourFerie {
     public LocalDate getDateJourFerie() {
         return dateJourFerie;
     }
+
+    public String getDescription() {
+        return description;
+    }
 }

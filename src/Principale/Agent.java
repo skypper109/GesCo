@@ -64,13 +64,44 @@ import java.util.List;
         }
 
         //La methode Pour l'indisponibilité :
-        public boolean ajoutIndisponible(String motif,LocalDate date){
+        public void ajoutIndisponible(String motif, LocalDate date){
             if (!indisponibiliteList.stream().filter(indisponibilite -> indisponibilite.getDateIndisponible().isEqual(date)).isParallel()){
                 Indisponibilite indispo = new Indisponibilite(getIdAgent(),motif,date);
                 indisponibiliteList.add(indispo);
-                return true;
             }
-            return false;
+        }
+
+
+        //Pour methode pour signalerIndisponibilite des agents :
+        public void signalerIndisponibilite(String motif,int idAgent, LocalDate date,AdministrateurRH admin){
+            for (Agent agent: admin.agentList){
+                if (agent.getIdAgent() == idAgent){
+                    agent.ajoutIndisponible(motif,date);
+                    System.out.println("Indisponibilité ajoutée pour le " + date);
+                    admin.planifieRotation(date);
+                    break;
+                }
+            }
+        }
+
+        //Methode pour le rappel et envoie de l'email:
+
+        public void rappelSiProcheTour(AdministrateurRH admin) {
+            LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
+            LocalDate demain = LocalDate.now().plusDays(1);
+
+            for (Historique h : admin.historiqueList) {
+                if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(dansDeuxJours)) {
+                    System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
+                    return;
+                } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
+                    System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
+                    return;
+                }
+            }
+
+            // Aucun rappel
+            System.out.println("Aucun rappel pour vous aujourd’hui.");
         }
 
         public void voirTourProchaine(AdministrateurRH admin) {

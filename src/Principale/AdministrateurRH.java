@@ -84,7 +84,7 @@ public class AdministrateurRH  extends User{
         Collections.sort(feriesTries);
 
         for (JourFerie date : jourFerieList) {
-            System.out.println("→ " + date);
+            System.out.println("******* → " + date.getDateJourFerie()+" ****** Le jour de :  "+date.getDescription());
         }
     }
     //Pour Trouver la prochaine date de rotation:
@@ -118,27 +118,85 @@ public class AdministrateurRH  extends User{
     //La methode pour la rotation :
     public void planifieRotation(LocalDate date){
         //On declare les deux types d'agents qui sont l'agent prevu et l'agent dispo:
-        Agent agentPrevu = agentList.get(positionActuelle);
-        Agent agentDisponible = trouveAgentDisponible(date);
+        LocalDate dateRotation = prochaineDateRotation(date);
 
-        //on verifie s'il y'a des agents dispos
-        if (agentDisponible == null){
-            System.out.println("Aucun agent n'est disponible pour l'instant !!!");
-            return;
-        }
-        String statut = agentDisponible.equals(agentPrevu) ? "En cour" : "Indisponible";
-        int remplancant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
-        String motif = "Pas de motif";
-        if (remplancant!=0){
-            for (Indisponibilite list:agentPrevu.indisponibiliteList){
-                if (list.getDateIndisponible().equals(date) && list.getId() == agentPrevu.getIdAgent()){
-                    motif = list.getMotif();
+        for (int i = 0; i < agentList.size(); i++) {
+            // L’agent qui devait normalement faire le tour
+            Agent agentPrevu = agentList.get(positionActuelle);
+
+            // Trouver un agent disponible pour cette date
+            Agent agentDisponible = trouveAgentDisponible(dateRotation);
+
+            if (agentDisponible == null) {
+                System.out.println("Aucun agent n'est disponible pour la date " + dateRotation + " !");
+                break;
+            }
+
+            // Déterminer le statut du tour
+            String statut = agentDisponible.equals(agentPrevu) ? "En cour" : "Indisponible";
+            int remplacant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
+            String motif = "Pas de motif";
+            if (remplacant!=0){
+                for (Indisponibilite list:agentPrevu.indisponibiliteList){
+                    if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()){
+                        motif = list.getMotif();
+                    }
                 }
             }
-        }
-        historiqueList.add(new Historique(agentPrevu.getIdAgent(),date,statut,motif,remplancant));
-        positionActuelle =(agentList.indexOf(agentDisponible) + 1)%agentList.size();
 
+            // Ajouter à l’historique
+            historiqueList.add(new Historique(agentPrevu.getIdAgent(),dateRotation,statut,motif,remplacant));
+
+            // Avancer dans la rotation circulaire
+            positionActuelle = (agentList.indexOf(agentDisponible) + 1) % agentList.size();
+
+            // Passer à la prochaine date valide
+            dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+        }
+
+        System.out.println("Assignation terminée avec succès pour la date du : "+date + " qui commencera le : " +dateRotation);
+
+    }
+
+    //La Rotation automatique :
+    public void planifierRotationAuto() {
+        LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
+
+        for (int i = 0; i < agentList.size(); i++) {
+            // L’agent qui devait normalement faire le tour
+            Agent agentPrevu = agentList.get(positionActuelle);
+
+            // Trouver un agent disponible pour cette date
+            Agent agentDisponible = trouveAgentDisponible(dateRotation);
+
+            if (agentDisponible == null) {
+                System.out.println("Aucun agent n'est disponible pour la date " + dateRotation + " !");
+                break;
+            }
+
+            // Déterminer le statut du tour
+            String statut = agentDisponible.equals(agentPrevu) ? "En cour" : "Indisponible";
+            int remplacant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
+            String motif = "Pas de motif";
+            if (remplacant!=0){
+                for (Indisponibilite list:agentPrevu.indisponibiliteList){
+                    if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()){
+                        motif = list.getMotif();
+                    }
+                }
+            }
+
+            // Ajouter à l’historique
+            historiqueList.add(new Historique(agentPrevu.getIdAgent(),dateRotation,statut,motif,remplacant));
+
+            // Avancer dans la rotation circulaire
+            positionActuelle = (agentList.indexOf(agentDisponible) + 1) % agentList.size();
+
+            // Passer à la prochaine date valide
+            dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+        }
+
+        System.out.println("Assignation terminée avec succès !");
     }
 
     public void afficheHistorique() {

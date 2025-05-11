@@ -80,15 +80,20 @@ public class GestionAgent {
         }
 
         System.out.println(nbAgent + (nbAgent > 1 ? " agents ont été ajoutés avec succès !" : " agent a été ajouté avec succès !"));
-        admin.planifieRotation(LocalDate.now());
+        System.out.println("Voulez vous faire une rotation Automatique en fonction de la date d'aujourd'hui (Oui/Non) ?");
+        String reponse = sc.next();
+        if (reponse.equals("oui")||reponse.equals("OUI") || reponse.equals("Oui")){
+            admin.planifieRotation(LocalDate.now());
+        }
         this.pause();
     }
 
     private void listAgent(){
         System.out.println("\nListe des agents :");
+        System.out.printf("%-25s | %-20s | %-25s\n", " Prenom de l'agent", " Nom de L'agent", " Email de l'Agent");
         System.out.println("____________________________________________________________________");
         for (Agent ag : admin.agentList) {
-            System.out.println("- " + ag.getPrenom() + " | " + ag.getNom() + " | " + ag.getEmail());
+            System.out.printf("%-25s | %-20s | %-25s\n",ag.getPrenom(),ag.getNom(), ag.getEmail());
             System.out.println("____________________________________________________________________");
         }
         this.pause();
