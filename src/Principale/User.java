@@ -6,29 +6,47 @@ import java.util.Arrays;
 import java.util.List;
 
 public class User {
-    private String username;
+    private String email;
     private String password;
     public List<User> userList;
     private String role;
 
-    public User(String username, String password, String role) {
-        this.username = username;
+    public User(String email, String password, String role) {
+        this.email = email;
         this.password = password;
         this.userList = new ArrayList<>();
         this.role = role;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public User() {
+        this.userList = new ArrayList<>();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public boolean authentifier(String username, String password){
+    public String getEmail(){
+        return this.email;
+    }
+    public boolean authentifier(String email, String password){
         for(User user:userList){
-            if (user.username.equals(username) && user.password.equals(password)){
+            if (user.email.equals(email) && user.password.equals(password)){
                 return true;
             }
         }
