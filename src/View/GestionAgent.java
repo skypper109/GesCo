@@ -65,6 +65,9 @@ public class GestionAgent {
         int nbAgent = sc.nextInt();
         int nbrAgent = admin.agentList.size();
         for (int i = 0; i < nbAgent; i++) {
+            if (i!=0){
+                System.out.println("--------------------------------------------------------");
+            }
             System.out.print("Saisir le nom de l'agent " + (i + 1) + " : ");
             sc.nextLine();
             String nom = sc.nextLine();
@@ -83,7 +86,7 @@ public class GestionAgent {
         System.out.println("Voulez vous faire une rotation Automatique en fonction de la date d'aujourd'hui (Oui/Non) ?");
         String reponse = sc.next();
         if (reponse.equals("oui")||reponse.equals("OUI") || reponse.equals("Oui")){
-            admin.planifieRotation(LocalDate.now());
+            admin.planifierRotationAuto();
         }
         this.pause();
     }
