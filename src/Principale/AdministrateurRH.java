@@ -7,7 +7,7 @@ import java.util.*;
 
 public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
-    private int positionActuelle;
+    public int positionActuelle;
     public List<Agent> agentList;
     public Set<Historique> historiqueList;
     public Set<JourFerie> jourFerieList;
@@ -38,8 +38,11 @@ public class AdministrateurRH  extends User{
     //Pour ajouter les agents :
 
     public boolean emailEstValide(String email) {
+        if (email != null && email.contains("@") && email.contains(".")){
+            return true;
+        }
         System.out.println("Cet email est invalide. Veuillez Saisir un email valide");
-        return email != null && email.contains("@") && email.contains(".");
+        return false;
     }
     public boolean emailExisteDeja(String email) {
         for (Agent agent : agentList) {
