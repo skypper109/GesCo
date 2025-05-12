@@ -229,6 +229,48 @@ public class AdministrateurRH  extends User{
         System.out.println("Assignation terminée avec succès !");
     }
 
+
+    public void afficherRotationAvenir(int nombreSemaines) {
+        if (agentList.isEmpty()) {
+            System.out.println("Aucun agent disponible pour la rotation.");
+            return;
+        }
+
+        LocalDate aujourdhui = LocalDate.now();
+        System.out.println("Calendrier des rotations à venir (" + nombreSemaines + " semaines):");
+        System.out.println("----------------------------------------");
+
+        for (int i = 0; i < nombreSemaines; i++) {
+            LocalDate dateRotation = prochaineDateRotation(aujourdhui.plusWeeks(i));
+            Agent agent = trouveAgentDisponible(dateRotation);
+
+            if (agent != null) {
+                System.out.printf("Semaine du %s: %s %s (%s)%n",
+                        dateRotation,
+                        agent.getPrenom(),
+                        agent.getNom(),
+                        agent.getEmail());
+
+                // Mettre à jour la position actuelle pour la prochaine rotation
+                positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
+
+                // Enregistrer dans l'historique
+                historiqueList.add(new Historique(
+                        agent.getIdAgent(),        // idAgent
+                        dateRotation,        // dateRotation
+                        "Planifié",         // statut
+                        "Rotation normale",  // motif
+                        -1                   // idAgentRemp (aucun remplaçant)
+                ));
+            } else {
+                System.out.printf("Semaine du %s: Aucun agent disponible%n", dateRotation);
+            }
+        }
+
+    }
+
+
+
     public void afficheHistorique() {
 
         if (historiqueList.isEmpty()) {

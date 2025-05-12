@@ -78,6 +78,7 @@ public class Main {
             }while (tentative > 0);
 
             ss.print("Voulez vous quitter l'application ? (Tapez Q/q ).... ");
+
             String quit = sc.nextLine();
             if (quit.equals("Q") || quit.equals("q")){
                 quitt = false;
