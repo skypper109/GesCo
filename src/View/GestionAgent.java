@@ -111,6 +111,8 @@ public class GestionAgent {
 
 
 
+
+
     private void retireAgent() {
         System.out.print("Entrez l'email de l'agent à retirer : ");
         String valeur = sc.next();
