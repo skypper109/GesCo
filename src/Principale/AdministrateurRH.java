@@ -89,6 +89,20 @@ public class AdministrateurRH {
         }
         return null;
     }
+
+    // Pour planifier les rotations
+    public void planifierRotation(LocalDate dateReference) {
+        LocalDate date = prochaineDateRotation(dateReference);
+        Agent agent = trouveAgentDisponible(date);
+
+        if (agent != null) {
+            positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
+            System.out.println(agent.getNom() + " est planifié pour le " + date);
+        } else {
+            System.out.println("Aucun agent disponible pour le " + date);
+        }
+    }
+
 }
 
 
