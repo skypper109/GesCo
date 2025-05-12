@@ -38,6 +38,11 @@ public class AdministrateurRH {
         }
         return false;
     }
+
+    private String formatDate(LocalDate date) {
+        return date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear();
+    }
+
     public boolean ajoutAgent(int id,String nom,String prenom,String email){
         if (emailEstValide(email) && !emailExisteDeja(email)){
             Agent agent = new Agent(id,nom,prenom,email);
@@ -88,6 +93,82 @@ public class AdministrateurRH {
 
         }
         return null;
+    }
+
+    // Pour afficher les rotations futures
+    public void afficherRotationAvenir(int nombreSemaines) {
+        if (agentList.isEmpty()) {
+            System.out.println("Aucun agent disponible pour la rotation.");
+            return;
+        }
+
+        LocalDate aujourdhui = LocalDate.now();
+        System.out.println("Calendrier des rotations à venir (" + nombreSemaines + " semaines):");
+        System.out.println("----------------------------------------");
+
+        for (int i = 0; i < nombreSemaines; i++) {
+            LocalDate dateRotation = prochaineDateRotation(aujourdhui.plusWeeks(i));
+            Agent agent = trouveAgentDisponible(dateRotation);
+
+            if (agent != null) {
+                System.out.printf("Semaine du %s: %s %s (%s)%n",
+                        dateRotation,
+                        agent.getPrenom(),
+                        agent.getNom(),
+                        agent.getEmail());
+
+                // Mettre à jour la position actuelle pour la prochaine rotation
+                positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
+
+                // Enregistrer dans l'historique
+                historiqueList.add(new Historique(
+                        agent.getIdAgent(),        // idAgent
+                        dateRotation,        // dateRotation
+                        "Planifié",         // statut
+                        "Rotation normale",  // motif
+                        -1                   // idAgentRemp (aucun remplaçant)
+                ));
+            } else {
+                System.out.printf("Semaine du %s: Aucun agent disponible%n", dateRotation);
+            }
+        }
+
+    }
+
+    //Methode pour afficher Historique de rotation
+    public void afficherHistorique() {
+        if (historiqueList.isEmpty()) {
+            System.out.println("Aucun historique de rotation disponible.");
+            return;
+        }
+
+        System.out.println("Historique des rotations:");
+        System.out.println("----------------------------------------");
+
+        for (Historique historique : historiqueList) {
+            // Trouver l'agent correspondant
+            Agent agent = agentList.stream()
+                    .filter(a -> a.getIdAgent() == historique.getIdAgent())
+                    .findFirst()
+                    .orElse(null);
+
+            System.out.println("Date: " + historique.getDateRotation());
+            System.out.println("Agent: " + (agent != null ?
+                    agent.getPrenom() + " " + agent.getNom() : "Inconnu"));
+            System.out.println("Statut: " + historique.getStatut());
+            System.out.println("Motif: " + historique.getMotif());
+
+
+            if (historique.getIdAgentRemp() != -1) {
+                Agent remplacant = agentList.stream()
+                        .filter(a -> a.getIdAgent() == historique.getIdAgentRemp())
+                        .findFirst()
+                        .orElse(null);
+                System.out.println("Remplaçant: " + (remplacant != null ?
+                        remplacant.getPrenom() + " " + remplacant.getNom() : "Inconnu"));
+            }
+            System.out.println("----------------------------------------");
+        }
     }
 }
 

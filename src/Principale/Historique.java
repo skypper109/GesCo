@@ -18,6 +18,7 @@ public class Historique {
         this.idAgentRemp = idAgentRemp;
     }
 
+
     public int getIdAgent() {
         return idAgent;
     }
