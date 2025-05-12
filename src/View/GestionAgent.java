@@ -93,14 +93,24 @@ public class GestionAgent {
 
     private void listAgent(){
         System.out.println("\nListe des agents :");
-        System.out.printf("%-25s | %-20s | %-25s\n", " Prenom de l'agent", " Nom de L'agent", " Email de l'Agent");
-        System.out.println("____________________________________________________________________");
+
+        String leftAlignFormat = "| %-15s | %-15s | %-30s |%n";
+        String ligne = "+-----------------+-----------------+--------------------------------+";
+
+        System.out.println(ligne);
+        System.out.format(leftAlignFormat, "Prénom", "Nom", "Email");
+        System.out.println(ligne);
+
         for (Agent ag : admin.agentList) {
-            System.out.printf("%-25s | %-20s | %-25s\n",ag.getPrenom(),ag.getNom(), ag.getEmail());
-            System.out.println("____________________________________________________________________");
+            System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail());
         }
+
+        System.out.println(ligne);
         this.pause();
     }
+
+
+
 
 
     private void retireAgent() {

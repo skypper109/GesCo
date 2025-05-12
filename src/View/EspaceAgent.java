@@ -29,7 +29,7 @@ public class EspaceAgent {
                 connected.add(agent);
                 Agent agentConnected = new Agent(agentID,agent.getNom(),agent.getPrenom(), agent.getEmail());
 
-                System.out.println("******************************\nBienvenue Agent " + connected.getFirst().getPrenom()+" "+ connected.getFirst().getNom() + " !******************************");
+                System.out.println("****************************** Bienvenue Agent " + connected.getFirst().getPrenom()+" "+ connected.getFirst().getNom() + " de CollabDej ! ******************************");
                 Historique tour = agentConnected.voirTourProchaine(agentID,admin);
                 if (tour!=null){
                     System.out.println("Votre prochain tour est prevu pour : "+ tour.getDateRotation());
@@ -67,7 +67,7 @@ public class EspaceAgent {
                     this.pause();
                     break;
                 case 2:
-                    connected.get(0).voirHistorique(agentID,admin);
+                    connected.getFirst().voirHistorique(agentID,admin);
                     this.pause();
                     break;
                 default:

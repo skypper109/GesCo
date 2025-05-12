@@ -102,19 +102,26 @@ import java.util.List;
             return null;
         }
         // methode voir historique
-        public void voirHistorique(int idAgent,AdministrateurRH admin) {
-            for (Historique h : admin.historiqueList) {
-                if (( (h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) || h.getIdAgentRemp() == idAgent)&& ( h.getDateRotation().isBefore(LocalDate.now()) ) ) {
-                    System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
-                }else {
-                    System.out.println("tu dois servir le petit dejeuner le : " + h.getDateRotation());
+    public void voirHistorique(int idAgent, AdministrateurRH admin) {
+        for (Historique h : admin.historiqueList) {
+            // Vérifie si l’agent est concerné (soit prévu, soit remplaçant)
+            boolean estConcerne = (h.getIdAgent() == idAgent && h.getIdAgentRemp() == 0) || h.getIdAgentRemp() == idAgent;
+
+            if (estConcerne) {
+                if (h.getDateRotation().isBefore(LocalDate.now())) {
+                    System.out.println("✅ Tu as servi le petit déjeuner le : " + h.getDateRotation());
+                } else {
+                    System.out.println("📅 Tu dois servir le petit déjeuner le : " + h.getDateRotation());
                 }
                 System.out.println("-------------------------------------------------------------------");
             }
+            // sinon on n’affiche rien
         }
+    }
 
 
-        //Methode pour le rappel et envoie de l'email:
+
+    //Methode pour le rappel et envoie de l'email:
 
         public void rappelSiProcheTour(AdministrateurRH admin) {
             LocalDate dansDeuxJours = LocalDate.now().plusDays(2);

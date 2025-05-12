@@ -38,12 +38,10 @@ public class AdministrateurRH  extends User{
     //Pour ajouter les agents :
 
     public boolean emailEstValide(String email) {
-
-        if (email  != null && email.contains("@") && email.contains(".")) {
-           return true;
-        }else {
-            System.out.println("Cet email est invalide. Veuillez Saisir un email valide");
+        if (email != null && email.contains("@") && email.contains(".")){
+            return true;
         }
+        System.out.println("Cet email est invalide. Veuillez Saisir un email valide");
         return false;
     }
     public boolean emailExisteDeja(String email) {

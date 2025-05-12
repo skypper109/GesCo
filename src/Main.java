@@ -22,6 +22,7 @@ public class Main {
             String password = "";
             int tentative = 3;
             do {
+                ss.println("----------------- Bienvenue sur CollabDej !!!----------------");
                 ss.print("Entrer votre username : ");
                 username = sc.nextLine();
                 ss.print("Entrer votre mot de passe : ");
@@ -43,7 +44,7 @@ public class Main {
                         tentative=0;
                     }else {
                         GestionAdmin admin = new GestionAdmin(user);
-                        ss.println("--------------Bienvenue Admin du systeme !!!----------------------");
+                        ss.println("--------------Bienvenue Admin du CollabDej !!!----------------------");
                         do {
                             System.out.println("1.) Tapez 1 pour la gestion des agents");
                             System.out.println("2.) Tapez 2 pour la gestion de rotation et de jour");
