@@ -19,6 +19,7 @@ public class Main {
         do {
             String username = "";
             String password = "";
+            ss.println("-------------------Bienvenue sur CollabDej-------------------");
             ss.print("Entrer votre username : ");
             username = sc.nextLine();
             ss.print("Entrer votre mot de passe : ");
@@ -32,7 +33,7 @@ public class Main {
                     ss.println("Agent connecté est : "+user.getEmail());
                 }else {
                     GestionAdmin admin = new GestionAdmin(user);
-                    ss.println("--------------Bienvenue Admin du systeme !!!----------------------");
+                    ss.println("--------------Bienvenue Admin de CollabDej !!!----------------------");
                     do {
                         System.out.println("1.) Tapez 1 pour la gestion des agents");
                         System.out.println("2.) Tapez 2 pour la gestion de rotation et de jour");
@@ -54,13 +55,13 @@ public class Main {
                                 break;
 
                             default:
-                                System.out.println("Choix invalide, veuillez réessayer.");
+                                System.out.println("Choix invalide, veuillez réessayer!");
                         }
                     }while (connect);
                 }
                 reconnect = true;
             }else {
-                ss.println("Informations invalide. Veillez reassayez");
+                ss.println("Informations invalide, Veillez reassayez!");
             }
 
             ss.print("Voulez vous quitter l'application ? (Tapez Q/q ).... ");
@@ -69,6 +70,6 @@ public class Main {
                 quitt = false;
             }
         }while (quitt);
-        ss.println("A tres bientot !!!");
+        ss.println("A très bientot !!!");
     }
 }

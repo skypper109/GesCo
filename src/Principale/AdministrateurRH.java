@@ -84,7 +84,7 @@ public class AdministrateurRH  extends User{
         Collections.sort(feriesTries);
 
         for (JourFerie date : jourFerieList) {
-            System.out.println("→ " + date);
+            System.out.println("→ " + date.getDateJourFerie());
         }
     }
     //Pour Trouver la prochaine date de rotation:
