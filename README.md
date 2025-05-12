@@ -1,4 +1,4 @@
-# DEJ
+# CollabDEJ
 
 **DEJ** est une application Java en ligne de commande conçue pour automatiser la rotation du petit-déjeuner en entreprise. Elle permet de planifier équitablement les tours des agents tout en tenant compte des jours fériés et des indisponibilités.
 
@@ -41,12 +41,12 @@ java Main
 ## 👤 Accès
 
 - **Admin**
-  - Username : `Admin`
-  - Password : `12345678`
+  - Username : `admin@gmail.com`
+  - Password : `admin1234`
 
 - **Agent**
   - Email : [votre email]
-  - Password : `1234`
+  - Password : `agent1234`
 
 ## 🔮 Améliorations futures
 
