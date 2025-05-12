@@ -7,9 +7,9 @@ public class Indisponibilite {
     private String motif;
     private LocalDate dateIndisponible;
 
-    public Indisponibilite(int id,String motif, LocalDate dateIndisponible) {
+    public Indisponibilite(int agentID,String motif, LocalDate dateIndisponible) {
         this.motif = motif;
-        this.id = id;
+        this.id = agentID;
         this.dateIndisponible = dateIndisponible;
     }
 
