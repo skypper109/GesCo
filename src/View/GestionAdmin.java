@@ -66,6 +66,7 @@ public class GestionAdmin {
     }
 
     private void planifierRotation() {
+        System.out.print("Entrez la date a laquelle commence la prochaine rotation (AAAA-MM-JJ) : ");
         String dat =sc.next();
         LocalDate date = LocalDate.parse(dat);
         admin.planifieRotation(date);

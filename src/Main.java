@@ -73,7 +73,7 @@ public class Main {
                 }
                 else {
                     tentative--;
-                    ss.println("Informations invalide.Il vous reste "+tentative+" Veillez reassayez ");
+                    ss.println("Informations invalide.Il vous reste "+tentative+" tentative Veillez reassayez ");
                 }
             }while (tentative > 0);
 

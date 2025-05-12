@@ -2,6 +2,7 @@ package View;
 
 import Principale.AdministrateurRH;
 import Principale.Agent;
+import Principale.Historique;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,14 +21,21 @@ public class EspaceAgent {
     public void afficheAgent(){
         List<Agent> listeAgent = admin.agentList;
         List<Agent> connected = new ArrayList<>();
+        int agentID = 0;
 
         for (Agent agent:listeAgent){
             if (agent.getEmail().equals(email)){
+                agentID = agent.getIdAgent();
                 connected.add(agent);
-                Agent agentConnected = new Agent(agent.getIdAgent(),agent.getNom(),agent.getPrenom(), agent.getEmail());
+                Agent agentConnected = new Agent(agentID,agent.getNom(),agent.getPrenom(), agent.getEmail());
 
                 System.out.println("******************************\nBienvenue Agent " + connected.getFirst().getPrenom()+" "+ connected.getFirst().getNom() + " !******************************");
-                agentConnected.voirTourProchaine(admin);
+                Historique tour = agentConnected.voirTourProchaine(agentID,admin);
+                if (tour!=null){
+                    System.out.println("Votre prochain tour est prevu pour : "+ tour.getDateRotation());
+                }else {
+                    System.out.println("**********Vous n'avez pas de tour prevu pour l'instant.***********");
+                }
                 agentConnected.rappelSiProcheTour(admin);
                 break;
             }
@@ -54,12 +62,12 @@ public class EspaceAgent {
                     System.out.print("Entrez le motif de ton indisponibilité : ");
                     sc.next();
                     String motif = sc.nextLine();
-                    connected.getFirst().signalerIndisponibilite(motif,connected.getFirst().getIdAgent(), indispo,admin);
+                    connected.getFirst().signalerIndisponibilite(motif,agentID, indispo,admin);
                     System.out.println("Indisponibilité enregistrée avec succès.");
                     this.pause();
                     break;
                 case 2:
-                    admin.afficheHistorique();
+                    connected.get(0).voirHistorique(agentID,admin);
                     this.pause();
                     break;
                 default:
