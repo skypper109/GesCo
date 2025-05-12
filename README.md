@@ -1,6 +1,6 @@
 # CollabDEJ
 
-**DEJ** est une application Java en ligne de commande conçue pour automatiser la rotation du petit-déjeuner en entreprise. Elle permet de planifier équitablement les tours des agents tout en tenant compte des jours fériés et des indisponibilités.
+**CollabDEJ** est une application Java en ligne de commande conçue pour automatiser la rotation du petit-déjeuner en entreprise. Elle permet de planifier équitablement les tours des agents tout en tenant compte des jours fériés et des indisponibilités.
 
 ## 🎯 Objectifs
 
