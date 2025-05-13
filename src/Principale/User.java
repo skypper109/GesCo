@@ -1,11 +1,14 @@
 package Principale;
 
+import GestionDB.Tables.Users;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class User {
+    public Users userTable = new Users();
     private String email;
     private String password;
     public List<User> userList;
@@ -34,6 +37,8 @@ public class User {
         return role;
     }
 
+
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -45,11 +50,7 @@ public class User {
         return this.email;
     }
     public boolean authentifier(String email, String password){
-        for(User user:userList){
-            if (user.email.equals(email) && user.password.equals(password)){
-                return true;
-            }
-        }
-        return false;
+       User user = userTable.list(email,password);
+        return user != null;
     }
 }

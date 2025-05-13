@@ -1,3 +1,5 @@
+import GestionDB.Connexion;
+import GestionDB.Tables.Users;
 import Principale.AdministrateurRH;
 import Principale.User;
 import View.EspaceAgent;
@@ -12,11 +14,16 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         boolean quitt = true;
+        Connexion con = new Connexion();
+        con.initDB();
+        Users users = new Users();
         boolean reconnect = false;
         Scanner sc = new Scanner(System.in);
         PrintStream ss = System.out;
         AdministrateurRH user = new AdministrateurRH(DayOfWeek.of(5));
-        user.ajoutAdmin();
+        if (users.isEmptyUser()){
+            user.ajoutAdmin();
+        }
         do {
             String username = "";
             String password = "";

@@ -1,5 +1,7 @@
 package Principale;
 
+import GestionDB.Tables.Users;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -8,6 +10,7 @@ import java.util.*;
 public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
     public int positionActuelle;
+    public Users users = new Users();
     public List<Agent> agentList;
     public Set<Historique> historiqueList;
     public Set<JourFerie> jourFerieList;
@@ -24,8 +27,11 @@ public class AdministrateurRH  extends User{
 
     //Ajout des identifiants de l'admin:
     public void ajoutAdmin(){
-        User admin = new User("admin@gmail.com","admin1234","Admin");
-        userList.add(admin);
+        String email = "admin@gmail.com";
+        String password = "admin1234";
+        String role = "Admin";
+        Users user = new Users();
+        user.insert(email,password,role);
     }
 
     public DayOfWeek getJourRotation() {
