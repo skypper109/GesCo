@@ -22,8 +22,9 @@ public class GestionAdmin {
             System.out.println("1. 📅 Afficher les agents avec leurs jours de rotation");
             System.out.println("2. 🔁 Changer le jour de rotation");
             System.out.println("3. 📌 Lancer une nouvelle rotation");
-            System.out.println("4. 🗓️ Ajouter un jour férié");
-            System.out.println("5. 📖 Voir les jours fériés enregistrés");
+            System.out.println("4. 📖 Afficher les rotations a venir");
+            System.out.println("5. 🗓️ Ajouter un jour férié");
+            System.out.println("6. 📖 Voir les jours fériés enregistrés");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier("Choisissez une option : ");
@@ -32,8 +33,9 @@ public class GestionAdmin {
                 case 1 -> afficherHistorique();
                 case 2 -> changerJourRotation();
                 case 3 -> planifierRotation();
-                case 4 -> ajouterJourFerie();
-                case 5 -> afficherJoursFeries();
+                case 4 -> afficherRotationAvenir();
+                case 5 -> ajouterJourFerie();
+                case 6 -> afficherJoursFeries();
                 case 0 -> System.out.println("Retour au menu principal...");
                 default -> System.out.println("❌ Option invalide. Essayez encore.");
             }
@@ -108,6 +110,12 @@ public class GestionAdmin {
             }
         }
         return valeur;
+    }
+
+    private void afficherRotationAvenir(){
+        int saisi = lireEntier("Entrez le nombre de Semaines à venir dont vous voulez voir : ");
+        admin.afficherRotationAvenir(saisi);
+        this.pause();
     }
 
     private void pause() {
