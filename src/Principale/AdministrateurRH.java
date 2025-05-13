@@ -39,7 +39,7 @@ public class AdministrateurRH  extends User{
 
     public boolean emailEstValide(String email) {
 
-        if (email  != null && email.contains("@") && email.contains(".")) {
+        if (email  != null && email.contains("@gmail.com")) {
            return true;
         }else {
             System.out.println("Cet email est invalide. Veuillez Saisir un email valide");
