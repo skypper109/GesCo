@@ -18,9 +18,6 @@ public class Connexion {
         }
     }
     public void initDB(){
-        String tableUserDrop= """
-                DROP TABLE IF EXISTS users ;
-                """;
         String tableUser= """
                 CREATE TABLE IF NOT EXISTS users (
                     idUser INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,15 +1,16 @@
 package View;
 
+import GestionDB.Tables.Agents;
 import Principale.AdministrateurRH;
 import Principale.Agent;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class GestionAgent {
     private DayOfWeek date;
+    public Agents tableAgent = new Agents();
     private final AdministrateurRH admin;
     private final Scanner sc= new Scanner(System.in);
     public GestionAgent(AdministrateurRH admin){
@@ -100,8 +101,8 @@ public class GestionAgent {
         System.out.println(ligne);
         System.out.format(leftAlignFormat, "Prénom", "Nom", "Email");
         System.out.println(ligne);
-
-        for (Agent ag : admin.agentList) {
+        List<Agent> listAgent = tableAgent.allAgent();
+        for (Agent ag :listAgent ) {
             System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail());
         }
 

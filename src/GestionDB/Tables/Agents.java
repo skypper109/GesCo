@@ -1,6 +1,87 @@
 package GestionDB.Tables;
 
+import GestionDB.Connexion;
+import Principale.Agent;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Agents {
+    Connection con = new Connexion().connect();
     public Agents(){}
-    //Pour l'insertion dans la table
+    //Pour l'insertion dans la table agents :
+    public void ajoutAgent(String nom,String prenom,String email){
+        String sql = "INSERT INTO agents(nom,prenom,email) VALUES(?,?,?)";
+        try(PreparedStatement pst = con.prepareStatement(sql)){
+            pst.setString(1,nom);
+            pst.setString(2,prenom);
+            pst.setString(3,email);
+            pst.executeUpdate();
+            System.out.println("Agent Ajouter avec succes !!!");
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de l'insertion dans la table Agents!!!");
+        }
+    }
+    //Pour lister l'ensemble des agents :
+    public List<Agent> allAgent(){
+        String commande = "SELECT * FROM agents";
+        try(PreparedStatement stmt = con.prepareStatement(commande)){
+            List<Agent> agents = new ArrayList<>();
+            var agent = stmt.executeQuery();
+            while (agent.next()){
+                Agent ag = new Agent(
+                        agent.getInt("idAgent"),
+                        agent.getString("nom"),
+                        agent.getString("prenom"),
+                        agent.getString("email")
+                );
+                agents.add(ag);
+            }
+            return agents;
+        }catch (SQLException e){
+            System.out.println("Erreur dans l'affichage !!!");
+        }
+        return null;
+    }
+    //Pour lister les informations d'un agent specifique hein :
+
+    public List<Agent> getAgent(int id){
+        String sql = "SELECT * FROM agents WHERE idAgent=?";
+        try(PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1,id);
+            var agent = pst.executeQuery();
+            List<Agent> agents = new ArrayList<>();
+            while (agent.next()){
+                Agent ag = new Agent(
+                        agent.getInt("idAgent"),
+                        agent.getString("nom"),
+                        agent.getString("prenom"),
+                        agent.getString("email")
+                );
+                agents.add(ag);
+            }
+            return agents;
+        }catch (SQLException e){
+            System.out.println("Erreur lors de recuperation de l'agent avec id : "+id);
+        }
+        return null;
+    }
+    //Pour la suppression d'un agent a travers sont email :
+    public boolean delAgent(String email){
+        String sql = "DELETE agents WHERE email=?";
+        try(PreparedStatement ptr = con.prepareStatement(sql)) {
+            ptr.setString(1,email);
+            ptr.executeQuery();
+            System.out.println("Agent supprimer avec succes !!!");
+            return true;
+        }catch (SQLException e){
+            System.out.println("Erreur lors de suppression dans la table agent !!!");
+        }
+        return false;
+    }
+
 }

@@ -1,0 +1,84 @@
+package GestionDB.Tables;
+
+import GestionDB.Connexion;
+import Principale.Historique;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+public class Historiques extends Connexion {
+    public Historiques(){}
+    Connection con = new Connexion().connect();
+    //Pour l'insertion dans la table Historique :
+    public void addHistorique(int idAgent, LocalDate dateRotation, String statut, String motif, int idAgentRempl){
+        String sql = "INSERT INTO historiques(dateRotation,agentPrevu,statut,motif,agentRemplacant) VALUES(?,?,?,?,?)";
+        try(PreparedStatement ptr=con.prepareStatement(sql)){
+            ptr.setDate(1, Date.valueOf(dateRotation));
+            ptr.setInt(2,idAgent);
+            ptr.setString(3,statut);
+            ptr.setString(4,motif);
+            ptr.setInt(5,idAgentRempl);
+            ptr.executeUpdate();
+            System.out.println("Ajout dans l'historique avec succes !!!");
+        }catch (SQLException e){
+            System.out.println("Erreur lors de l'insertion dans la table historique !!!");
+        }
+    }
+    //Pour affichage de tout l'historique :
+    public Historique allHistorique(){
+        String sql = "SELECT * FROM historiques";
+        try(PreparedStatement ptr=con.prepareStatement(sql)){
+            var agent = ptr.executeQuery();
+            return new Historique(
+                    agent.getInt("agentPrevu"),
+                    agent.getDate("dateRotation").toLocalDate(),
+                    agent.getString("statut"),
+                    agent.getString("motif"),
+                    agent.getInt("agentRemplacant")
+            );
+        }catch (SQLException e){
+            System.out.println("Erreur lors des recuperation des elements dans la table historique !!!");
+        }
+        return null;
+    }
+
+    //Pour recuperer uniquement les historiques qui ne concerne que les
+    public Historique getHistoriqueById(int id){
+        String sql = "SELECT * FROM historiques WHERE agentPrevu=? or agentRemplacant=?";
+
+        try(PreparedStatement ptr=con.prepareStatement(sql)){
+            ptr.setInt(1,id);
+            ptr.setInt(2,id);
+            var agent = ptr.executeQuery();
+            return new Historique(
+                    agent.getInt("idAgent"),
+                    agent.getDate("dateRotation").toLocalDate(),
+                    agent.getString("statut"),
+                    agent.getString("motif"),
+                    agent.getInt("idAgentRempl")
+            );
+        }catch (SQLException e){
+            System.out.println("Erreur lors des recuperation des elements dans la table historique!!!");
+        }
+        return null;
+
+    }
+
+    //Pour la suppression des elements en fonction d'une date precises :
+    public void deleteHistoriqueByDate(LocalDate date){
+        Date date1 = Date.valueOf(date);
+        String commande = "DELETE FROM historiques WHERE dateRotation > ?";
+
+        try(PreparedStatement ptr=con.prepareStatement(commande)){
+            ptr.setDate(1,date1);
+            ptr.executeQuery();
+            System.out.println("Les elements du futur dans la table historique effacer avec succes !!!!");
+        }catch (SQLException e){
+            System.out.println("Erreur lors des recuperation des elements dans la table historique!!!");
+        }
+    }
+
+}

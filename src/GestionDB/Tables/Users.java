@@ -55,4 +55,20 @@ public class Users {
             return true;
         }
     }
+
+    //Supprimer un utilisateur :
+    public boolean deleteUser(String email){
+        String sql = "DELETE FROM users WHERE email =?";
+
+        try(Connection con = new Connexion().connect();
+            PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1,email);
+            stmt.executeQuery();
+            System.out.println("L'utilisateur supprimer avec succes !!!");
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Suppression de user dans la base de donnée n'a pas aboutie!");
+        }
+        return false;
+    }
 }
