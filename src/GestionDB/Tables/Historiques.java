@@ -8,6 +8,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Historiques extends Connexion {
     public Historiques(){}
@@ -28,17 +30,22 @@ public class Historiques extends Connexion {
         }
     }
     //Pour affichage de tout l'historique :
-    public Historique allHistorique(){
+    public List<Historique> allHistorique(){
         String sql = "SELECT * FROM historiques";
         try(PreparedStatement ptr=con.prepareStatement(sql)){
-            var agent = ptr.executeQuery();
-            return new Historique(
-                    agent.getInt("agentPrevu"),
-                    agent.getDate("dateRotation").toLocalDate(),
-                    agent.getString("statut"),
-                    agent.getString("motif"),
-                    agent.getInt("agentRemplacant")
-            );
+            var historique = ptr.executeQuery();
+            List<Historique> historiqueList = new ArrayList<>();
+            while (historique.next()){
+                Historique hist = new Historique(
+                        historique.getInt("agentPrevu"),
+                        historique.getDate("dateRotation").toLocalDate(),
+                        historique.getString("statut"),
+                        historique.getString("motif"),
+                        historique.getInt("agentRemplacant")
+                );
+                historiqueList.add(hist);
+            }
+            return historiqueList;
         }catch (SQLException e){
             System.out.println("Erreur lors des recuperation des elements dans la table historique !!!");
         }
@@ -46,20 +53,25 @@ public class Historiques extends Connexion {
     }
 
     //Pour recuperer uniquement les historiques qui ne concerne que les
-    public Historique getHistoriqueById(int id){
+    public List<Historique> getHistoriqueById(int id){
         String sql = "SELECT * FROM historiques WHERE agentPrevu=? or agentRemplacant=?";
 
         try(PreparedStatement ptr=con.prepareStatement(sql)){
             ptr.setInt(1,id);
             ptr.setInt(2,id);
-            var agent = ptr.executeQuery();
-            return new Historique(
-                    agent.getInt("idAgent"),
-                    agent.getDate("dateRotation").toLocalDate(),
-                    agent.getString("statut"),
-                    agent.getString("motif"),
-                    agent.getInt("idAgentRempl")
-            );
+            var historique = ptr.executeQuery();
+            List<Historique> historiqueList = new ArrayList<>();
+            while (historique.next()){
+                Historique hist = new Historique(
+                        historique.getInt("agentPrevu"),
+                        historique.getDate("dateRotation").toLocalDate(),
+                        historique.getString("statut"),
+                        historique.getString("motif"),
+                        historique.getInt("agentRemplacant")
+                );
+                historiqueList.add(hist);
+            }
+            return historiqueList;
         }catch (SQLException e){
             System.out.println("Erreur lors des recuperation des elements dans la table historique!!!");
         }
@@ -74,7 +86,7 @@ public class Historiques extends Connexion {
 
         try(PreparedStatement ptr=con.prepareStatement(commande)){
             ptr.setDate(1,date1);
-            ptr.executeQuery();
+            ptr.executeUpdate();
             System.out.println("Les elements du futur dans la table historique effacer avec succes !!!!");
         }catch (SQLException e){
             System.out.println("Erreur lors des recuperation des elements dans la table historique!!!");

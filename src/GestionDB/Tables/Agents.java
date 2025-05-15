@@ -72,14 +72,20 @@ public class Agents {
     }
     //Pour la suppression d'un agent a travers sont email :
     public boolean delAgent(String email){
-        String sql = "DELETE agents WHERE email=?";
+        String sql = "DELETE FROM agents WHERE email=?";
         try(PreparedStatement ptr = con.prepareStatement(sql)) {
             ptr.setString(1,email);
-            ptr.executeQuery();
-            System.out.println("Agent supprimer avec succes !!!");
-            return true;
+            int nbLigne = ptr.executeUpdate();
+
+            if (nbLigne > 0) {
+                System.out.println("✅ Agent supprimé avec succès !");
+                return true;
+            } else {
+                System.out.println("❗ Aucun agent trouvé avec cet email.");
+                return false;
+            }
         }catch (SQLException e){
-            System.out.println("Erreur lors de suppression dans la table agent !!!");
+            System.out.println("Erreur lors de suppression dans la table agent !!! "+e.getMessage());
         }
         return false;
     }

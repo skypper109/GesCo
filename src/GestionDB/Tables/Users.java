@@ -63,7 +63,7 @@ public class Users {
         try(Connection con = new Connexion().connect();
             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1,email);
-            stmt.executeQuery();
+            stmt.executeUpdate();
             System.out.println("L'utilisateur supprimer avec succes !!!");
             return true;
         } catch (SQLException e) {

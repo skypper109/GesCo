@@ -3,9 +3,9 @@ package Principale;
 import java.time.LocalDate;
 
 public class Indisponibilite {
-    private int id;
-    private String motif;
-    private LocalDate dateIndisponible;
+    private final int id;
+    private final String motif;
+    private final LocalDate dateIndisponible;
 
     public Indisponibilite(int agentID,String motif, LocalDate dateIndisponible) {
         this.motif = motif;

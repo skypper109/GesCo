@@ -1,7 +1,6 @@
 package Principale;
 
-import GestionDB.Tables.Agents;
-import GestionDB.Tables.Users;
+import GestionDB.Tables.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -11,9 +10,14 @@ import java.util.*;
 public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
     public int positionActuelle;
-    public Users users = new Users();
     public List<Agent> agentList;
+    //La liste des tables :
     public Agents tableAgent = new Agents();
+    public JoursFeries tableJourFerie = new JoursFeries();
+    public Indisponibilites tableIndisponibilite = new Indisponibilites();
+    public Historiques tableHistorique = new Historiques();
+    public Users tableUser = new Users();
+
     public Set<Historique> historiqueList;
     public Set<JourFerie> jourFerieList;
     public JourFerie jourFerie;
@@ -32,8 +36,7 @@ public class AdministrateurRH  extends User{
         String email = "admin@gmail.com";
         String password = "admin1234";
         String role = "Admin";
-        Users user = new Users();
-        user.insert(email,password,role);
+        tableUser.insert(email,password,role);
     }
 
     public DayOfWeek getJourRotation() {
@@ -61,20 +64,14 @@ public class AdministrateurRH  extends User{
         }
         return false;
     }
-    public void ajoutAgent(int id, String nom, String prenom, String email){
+    public void ajoutAgent(String nom, String prenom, String email){
         if (emailEstValide(email) && !emailExisteDeja(email)){
-            //Agent agent = new Agent(id,nom,prenom,email);
             tableAgent.ajoutAgent(nom,prenom,email);
-            //agentList.add(agent);
-            //userList.add(new User(email,"agent1234","Agent"));
             userTable.insert(email,"agent1234","Agent");
         }
     }
     //Pour retirer un agent
     public boolean retireAgent(String email){
-        //Avec une fonction conditionnelle(Lambda) qui agit en supprimmant tout élément x qui vérifie la condition x ->
-        //return  agentList.removeIf(a -> a.getEmail().equalsIgnoreCase(email)) && userList.removeIf(u -> u.getEmail().equalsIgnoreCase(email));
-
         return tableAgent.delAgent(email) && userTable.deleteUser(email);
     }
     //Pour l'ajout des jours Fériés

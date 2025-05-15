@@ -1,6 +1,7 @@
 package View;
 
 import GestionDB.Tables.Agents;
+import GestionDB.Tables.Users;
 import Principale.AdministrateurRH;
 import Principale.Agent;
 
@@ -11,6 +12,7 @@ import java.util.*;
 public class GestionAgent {
     private DayOfWeek date;
     public Agents tableAgent = new Agents();
+    public Users tableUser = new Users();
     private final AdministrateurRH admin;
     private final Scanner sc= new Scanner(System.in);
     public GestionAgent(AdministrateurRH admin){
@@ -80,7 +82,7 @@ public class GestionAgent {
                 email = sc.next();
             }while (!admin.emailEstValide(email) || admin.emailExisteDeja(email));
             nbrAgent++;
-            admin.ajoutAgent(nbrAgent,nom,prenom,email);
+            admin.ajoutAgent(nom,prenom,email);
         }
 
         System.out.println(nbAgent + (nbAgent > 1 ? " agents ont été ajoutés avec succès !" : " agent a été ajouté avec succès !"));
@@ -104,9 +106,8 @@ public class GestionAgent {
         List<Agent> listAgent = tableAgent.allAgent();
         for (Agent ag :listAgent ) {
             System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail());
+            System.out.println(ligne);
         }
-
-        System.out.println(ligne);
         this.pause();
     }
 
@@ -118,11 +119,10 @@ public class GestionAgent {
         System.out.print("Entrez l'email de l'agent à retirer : ");
         String valeur = sc.next();
         if (admin.retireAgent(valeur)){
-            System.out.println("Agent Supprimer avec succès !!");
+            pause();
         }else{
             System.out.println("Email saisi est soit incorrect soit inexistant dans la base. Veillez Reassayez plus tard!");
         }
-        pause();
     }
 
 }
