@@ -19,9 +19,7 @@ public class Main {
         AdministrateurRH user = new AdministrateurRH(DayOfWeek.of(5));
         user.ajoutAdmin();
         Accueil acc = new Accueil();
-        //acc.accueil();
-        acc.espaceAgent();
-        //acc.espaceAdmin();
+        acc.accueil();
         do {
             String username = "";
             String password = "";
