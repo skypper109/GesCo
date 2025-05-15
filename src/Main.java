@@ -5,6 +5,7 @@ import View.EspaceAgent;
 import View.GestionAdmin;
 import View.GestionAgent;
 
+import java.io.Console;
 import java.io.PrintStream;
 import java.time.DayOfWeek;
 import java.util.Objects;
@@ -25,10 +26,18 @@ public class Main {
             String password = "";
             int tentative = 3;
             do {
+                ss.println("===================================== Login =====================================");
                 ss.print("Entrer votre username : ");
                 username = sc.nextLine();
-                ss.print("Entrer votre mot de passe : ");
-                password = sc.nextLine();
+                Console console = System.console();
+
+                if (console != null) {
+                    char[] passArray = console.readPassword("Entrer votre mot de passe : ");
+                    password = new String(passArray);
+                } else {
+                    ss.print("Entrer votre mot de passe : ");
+                    password = sc.nextLine(); // fallback si console non dispo
+                }
                 //Verification de qui doit se connecter :
                 if (user.authentifier(username,password)){
                     //Verifier qui est connecter si c'est admin ou une autre personne :

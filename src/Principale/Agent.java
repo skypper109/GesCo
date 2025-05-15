@@ -89,6 +89,7 @@ import java.util.List;
                     break;
                 }
                 i++;
+
             }
         }
 
@@ -104,10 +105,12 @@ import java.util.List;
         // methode voir historique
         public void voirHistorique(int idAgent,AdministrateurRH admin) {
             for (Historique h : admin.historiqueList) {
-                if (( (h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) || h.getIdAgentRemp() == idAgent)&& ( h.getDateRotation().isBefore(LocalDate.now()) ) ) {
+                if ( ((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isBefore(LocalDate.now()) ) ) {
                     System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
-                }else {
+                } else if (((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isAfter(LocalDate.now()) ) ) {
                     System.out.println("tu dois servir le petit dejeuner le : " + h.getDateRotation());
+                } else if (h.getIdAgentRemp() == idAgent){
+                    System.out.println("tu as remplacé un agent le  : " + h.getDateRotation());
                 }
                 System.out.println("-------------------------------------------------------------------");
             }

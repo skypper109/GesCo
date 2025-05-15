@@ -33,8 +33,7 @@ public class Accueil {
                 "                                                                                                                                         jjjjjj          " );
 
         System.out.print("Appuyez sur entrer pour continuer ...");
-        sc.next();
-        sc.next();
+        sc.nextLine();
     }
 
     public void espaceAdmin(){

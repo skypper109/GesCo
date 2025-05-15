@@ -9,8 +9,8 @@ public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
     public int positionActuelle;
     public List<Agent> agentList;
-    public Set<Historique> historiqueList;
-    public Set<JourFerie> jourFerieList;
+    public List<Historique> historiqueList;
+    public List<JourFerie> jourFerieList;
     public JourFerie jourFerie;
 
     public AdministrateurRH(DayOfWeek jourRotation) {
@@ -18,8 +18,8 @@ public class AdministrateurRH  extends User{
         this.jourRotation = jourRotation;
         this.positionActuelle = 0;
         this.agentList = new ArrayList<>();
-        this.historiqueList = new HashSet<>();
-        this.jourFerieList = new HashSet<>();
+        this.historiqueList = new ArrayList<>();
+        this.jourFerieList = new ArrayList<>();
     }
 
     //Ajout des identifiants de l'admin:
@@ -125,6 +125,8 @@ public class AdministrateurRH  extends User{
         //On declare les deux types d'agents qui sont l'agent prevu et l'agent dispo:
         LocalDate dateRotation = prochaineDateRotation(date);
 
+
+        historiqueList.removeIf(historique -> historique.getDateRotation().isAfter(date.minusDays(1)));
         for (int i = 0; i < agentList.size(); i++) {
             boolean verif = true;
             for (Historique hist:historiqueList){
@@ -183,8 +185,9 @@ public class AdministrateurRH  extends User{
         for (int i = 0; i < agentList.size(); i++) {
             boolean verif = true;
             for (Historique hist:historiqueList){
-                if (agentList.get(i).getIdAgent() == hist.getIdAgent() && hist.getDateRotation().equals(dateRotation)){
+                if ( (agentList.get(i).getIdAgent() == hist.getIdAgent()) && (hist.getDateRotation().equals(dateRotation) ||hist.getDateRotation().isAfter(LocalDate.now())) ){
                     verif=false;
+                    System.out.println("Agent Existe déjà !!!");
                     break;
                 }
             }
@@ -207,7 +210,6 @@ public class AdministrateurRH  extends User{
                 for (Indisponibilite list:agentPrevu.indisponibiliteList){
                     if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()){
                         motif = list.getMotif();
-                        verif=true;
                     }
                 }
             }
@@ -279,9 +281,10 @@ public class AdministrateurRH  extends User{
         }
 
         System.out.println("\n HISTORIQUE DES ROTATIONS\n");
+        System.out.println("----------------------------------------------------------------------------------------------------");
         //On utilise des spécificateurs de format pour organiser les colonnes a l'affichage
         // % debut du format; - aligner a gauche; 15 nombre de caractere; s le type de contenu
-        System.out.printf("%-15s | %-25s | %-15s | %-20s | %-20s\n", " Date", " Agent Prévu", " Statut", " Remplaçant","Motif");
+        System.out.printf("|%-15s | %-25s | %-15s | %-20s | %-20s|\n", " Date", " Agent Prévu", " Statut", " Remplaçant","Motif");
         System.out.println("----------------------------------------------------------------------------------------------------");
 
         for (Historique h : historiqueList) {
@@ -306,7 +309,7 @@ public class AdministrateurRH  extends User{
                     statut = "Remplaçer ->";
                 }
             }
-            System.out.printf("%-15s | %-25s | %-15s | %-20s | %-20s\n", date, agentNom, statut, remplacant,motif);
+            System.out.printf("| %-15s | %-25s | %-15s | %-20s | %-20s |\n", date, agentNom, statut, remplacant,motif);
             System.out.println("----------------------------------------------------------------------------------------------------");
         }
     }
