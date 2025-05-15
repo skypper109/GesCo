@@ -18,7 +18,7 @@ public class EspaceAgent {
         this.email = email;
         this.afficheAgent();
     }
-    public void afficheAgent(){
+    private void afficheAgent(){
         List<Agent> listeAgent = admin.agentList;
         List<Agent> connected = new ArrayList<>();
         int agentID = 0;
@@ -76,7 +76,7 @@ public class EspaceAgent {
         } while (ch != 0);
 
     }
-    public void pause(){
+    private void pause(){
         System.out.print("Appuyez sur Entrée pour continuer...");
         sc.nextLine(); // vider éventuelle ligne précédente
         sc.nextLine();

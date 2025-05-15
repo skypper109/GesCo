@@ -1,5 +1,6 @@
 import Principale.AdministrateurRH;
 import Principale.User;
+import View.Accueil;
 import View.EspaceAgent;
 import View.GestionAdmin;
 import View.GestionAgent;
@@ -17,6 +18,10 @@ public class Main {
         PrintStream ss = System.out;
         AdministrateurRH user = new AdministrateurRH(DayOfWeek.of(5));
         user.ajoutAdmin();
+        Accueil acc = new Accueil();
+        //acc.accueil();
+        acc.espaceAgent();
+        //acc.espaceAdmin();
         do {
             String username = "";
             String password = "";
@@ -39,11 +44,12 @@ public class Main {
                     }
 
                     if (role.equals("Agent")){
+                        acc.espaceAgent();
                         new EspaceAgent(user,username);
                         tentative=0;
                     }else {
                         GestionAdmin admin = new GestionAdmin(user);
-                        ss.println("--------------Bienvenue Admin du systeme !!!----------------------");
+                        acc.espaceAdmin();
                         do {
                             System.out.println("1.) Tapez 1 pour la gestion des agents");
                             System.out.println("2.) Tapez 2 pour la gestion de rotation et de jour");
