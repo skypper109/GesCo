@@ -1,5 +1,7 @@
 package Principale;
 
+import View.ServiceMail;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,11 +129,23 @@ import java.util.List;
             LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
             LocalDate demain = LocalDate.now().plusDays(1);
 
+            ServiceMail mail = new ServiceMail();
+
             for (Historique h : admin.historiqueList) {
                 if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(dansDeuxJours)) {
+                    mail.envoyerEmail(
+                            this.email,
+                            "📅 Rappel de votre tour DEJ",
+                            "Bonjour,\nVous êtes prévu pour offrir le petit-déjeuner dans 2 jours.\nMerci !"
+                    );
                     System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
                     return;
                 } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
+                    mail.envoyerEmail(
+                            this.email,
+                            "📅 Rappel de votre tour DEJ",
+                            "Bonjour,\nVous êtes prévu pour offrir le petit-déjeuner de damain.\nMerci !"
+                    );
                     System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
                     return;
                 }
