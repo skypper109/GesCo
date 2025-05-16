@@ -8,8 +8,8 @@ import java.util.List;
 public class User {
     private String email;
     private String password;
-    public List<User> userList;
-    private String role;
+    public  List<User> userList;
+    private static String role;
 
     public User(String email, String password, String role) {
         this.email = email;
@@ -19,7 +19,7 @@ public class User {
     }
 
     public User() {
-        this.userList = new ArrayList<>();
+        userList = new ArrayList<>();
     }
 
     public String getPassword() {
@@ -30,7 +30,7 @@ public class User {
         return userList;
     }
 
-    public String getRole() {
+    public static String getRole() {
         return role;
     }
 
@@ -44,7 +44,7 @@ public class User {
     public String getEmail(){
         return this.email;
     }
-    public boolean authentifier(String email, String password){
+    public  boolean authentifier(String email, String password){
         for(User user:userList){
             if (user.email.equals(email) && user.password.equals(password)){
                 return true;

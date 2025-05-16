@@ -1,9 +1,7 @@
 import Principale.AdministrateurRH;
+import Principale.Agent;
 import Principale.User;
-import View.Accueil;
-import View.EspaceAgent;
-import View.GestionAdmin;
-import View.GestionAgent;
+import View.*;
 
 import java.io.Console;
 import java.io.PrintStream;
@@ -13,90 +11,44 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        boolean quitt = true;
-        boolean reconnect = false;
         Scanner sc = new Scanner(System.in);
-        PrintStream ss = System.out;
-        AdministrateurRH user = new AdministrateurRH(DayOfWeek.of(5));
-        user.ajoutAdmin();
-        Accueil acc = new Accueil();
-        acc.accueil();
-        do {
-            String username = "";
-            String password = "";
-            int tentative = 3;
-            do {
-                ss.println("===================================== Login =====================================");
-                ss.print("Entrer votre username : ");
-                username = sc.nextLine();
-                Console console = System.console();
+        // 1. Affichage d'accueil avec logo DEJ
+        new Accueil().accueil();
 
-                if (console != null) {
-                    char[] passArray = console.readPassword("Entrer votre mot de passe : ");
-                    password = new String(passArray);
-                } else {
-                    ss.print("Entrer votre mot de passe : ");
-                    password = sc.nextLine(); // fallback si console non dispo
+        // 2. Instanciation de l'administrateur RH
+        AdministrateurRH admin = new AdministrateurRH(DayOfWeek.of(5));
+        admin.ajoutAdmin();
+        // 3. Menu principal de navigation
+        boolean quitter = false;
+        while (!quitter) {
+            System.out.println("\n========= 🟢 MENU PRINCIPAL =========");
+            System.out.println("1. 👤 Se connecter (Admin/Agent)");
+            System.out.println("2. 📋 Voir tous les agents enregistrés");
+            System.out.println("0. ❌ Quitter l'application");
+            System.out.print("Votre choix : ");
+
+            String choix = sc.nextLine().trim();
+
+            switch (choix) {
+                case "1" -> new Authentification().start(admin);
+                case "2" -> afficherAgents(admin);
+                case "0" -> {
+                    quitter = true;
+                    System.out.println("\n👋 Merci d’avoir utilisé DEJ ! À bientôt.");
                 }
-                //Verification de qui doit se connecter :
-                if (user.authentifier(username,password)){
-                    //Verifier qui est connecter si c'est admin ou une autre personne :
-                    boolean connect = true;
-                    String role = "";
-                    for (User us: user.userList){
-                        if (us.getEmail().equals(username)&&us.getPassword().equals(password)){
-                            role = us.getRole();
-                            break;
-                        }
-                    }
-
-                    if (role.equals("Agent")){
-                        acc.espaceAgent();
-                        new EspaceAgent(user,username);
-                        tentative=0;
-                    }else {
-                        GestionAdmin admin = new GestionAdmin(user);
-                        acc.espaceAdmin();
-                        do {
-                            System.out.println("1.) Tapez 1 pour la gestion des agents");
-                            System.out.println("2.) Tapez 2 pour la gestion de rotation et de jour");
-                            System.out.println("0.) Tapez 0 pour se deconnecter");
-                            int choix = admin.lireEntier("\nFaites un choix : ");
-
-                            switch (choix) {
-                                case 1:
-                                    new GestionAgent(user);
-                                    break;
-
-                                case 2:
-                                    admin.afficherMenu();
-                                    break;
-
-                                case 0:
-                                    connect = false;
-                                    ss.println("Deconnecter...");
-                                    tentative=3;
-                                    break;
-
-                                default:
-                                    System.out.println("Choix invalide, veuillez réessayer.");
-                            }
-                        }while (connect);
-                    }
-                }
-                else {
-                    tentative--;
-                    ss.println("Informations invalide.Il vous reste "+tentative+" tentative Veillez reassayez ");
-                }
-            }while (tentative > 0);
-
-            ss.print("Voulez vous quitter l'application ? (Tapez Q/q ).... ");
-
-            String quit = sc.nextLine();
-            if (quit.equals("Q") || quit.equals("q")){
-                quitt = false;
+                default -> System.out.println("❌ Choix invalide. Veuillez réessayer.");
             }
-        }while (quitt);
-        ss.println("A tres bientot !!!");
+        }
+    }
+
+    private static void afficherAgents(AdministrateurRH admin) {
+        System.out.println("\n👥 Agents enregistrés :");
+        if (admin.agentList.isEmpty()) {
+            System.out.println("Aucun agent trouvé.");
+            return;
+        }
+        for (Agent ag : admin.agentList) {
+            System.out.println(" - " + ag.getPrenom() + " " + ag.getNom() + " | " + ag.getEmail());
+        }
     }
 }

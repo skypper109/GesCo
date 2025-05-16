@@ -55,5 +55,11 @@ public class Accueil {
                 "`------'`----' |  |-'  `--`--' `---' `----'    `--' `--'.`-  /  `----'`--''--'  `--'      \n" +
                 "               `--'                                     `---'                             ");
     }
+    public void afficher() {
+        System.out.println("\n\n🎉 BIENVENUE SUR DEJ - GESTION DE ROTATION D'ÉQUIPE 🎉");
+        // + ASCII Art si tu veux
 
+        System.out.print("Appuyez sur Entrée pour continuer...");
+        new Scanner(System.in).nextLine();
+    }
 }

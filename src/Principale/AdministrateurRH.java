@@ -69,13 +69,11 @@ public class AdministrateurRH  extends User{
                 userList.removeIf(u -> u.getEmail().equalsIgnoreCase(email));
     }
     //Pour l'ajout des jours Fériés
-    public boolean ajoutJourFerie(LocalDate date,String description){
+    public void ajoutJourFerie(LocalDate date, String description){
         if (!jourFerieList.stream().filter(jourFerie -> jourFerie.getDateJourFerie().equals(date)).isParallel()){
             JourFerie jour = new JourFerie(date,description);
             jourFerieList.add(jour);
-            return true;
         }
-        return false;
     }
 
     public void afficherJoursFeries() {
@@ -121,198 +119,280 @@ public class AdministrateurRH  extends User{
     }
 
     //La methode pour la rotation :
-    public void planifieRotation(LocalDate date){
-        //On declare les deux types d'agents qui sont l'agent prevu et l'agent dispo:
+    public void planifieRotation(LocalDate date) {
+        // 🔒 Vérification : la date fournie ne doit pas être dans le passé
+        if (date.isBefore(LocalDate.now())) {
+            System.out.println("❌ Erreur : Impossible de planifier une rotation dans le passé (" + date + ").");
+            return;
+        }
+
+        // Définir la première date de rotation valide
         LocalDate dateRotation = prochaineDateRotation(date);
 
-
+        // Supprimer les historiques à partir de cette date
         historiqueList.removeIf(historique -> historique.getDateRotation().isAfter(date.minusDays(1)));
+
         for (int i = 0; i < agentList.size(); i++) {
             boolean verif = true;
-            for (Historique hist:historiqueList){
-                if (agentList.get(i).getIdAgent() == hist.getIdAgent() && hist.getDateRotation().equals(dateRotation)){
-                    verif=false;
-                    System.out.println("Agent existe deja");
+
+            for (Historique hist : historiqueList) {
+                if (agentList.get(i).getIdAgent() == hist.getIdAgent()
+                        && hist.getDateRotation().equals(dateRotation)) {
+                    verif = false;
+                    System.out.println("⚠️ Agent déjà planifié pour " + dateRotation);
                     break;
                 }
             }
-            // L’agent qui devait normalement faire le tour
-            Agent agentPrevu = agentList.get(positionActuelle);
 
-            // Trouver un agent disponible pour cette date
+            Agent agentPrevu = agentList.get(positionActuelle);
             Agent agentDisponible = trouveAgentDisponible(dateRotation);
 
             if (agentDisponible == null) {
-                System.out.println("Aucun agent n'est disponible pour la date " + dateRotation + " !");
+                System.out.println("❌ Aucun agent n'est disponible pour la date " + dateRotation + " !");
                 break;
             }
 
-            // Déterminer le statut du tour
-            String statut = agentDisponible.equals(agentPrevu) && dateRotation.isAfter(LocalDate.now()) ? "En cour" : "Indisponible";
+            String statut = agentDisponible.equals(agentPrevu) && dateRotation.isAfter(LocalDate.now())
+                    ? "En cours"
+                    : "Indisponible";
+
             int remplacant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
             String motif = "Pas de motif";
-            if (remplacant!=0){
-                for (Indisponibilite list:agentPrevu.indisponibiliteList){
-                    if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()){
+
+            if (remplacant != 0) {
+                for (Indisponibilite list : agentPrevu.indisponibiliteList) {
+                    if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()) {
                         motif = list.getMotif();
+                        break;
                     }
                 }
             }
 
-
-            if (verif){
-
-                // Ajouter à l’historique
-                historiqueList.add(new Historique(agentPrevu.getIdAgent(),dateRotation,statut,motif,remplacant));
-
+            if (verif) {
+                historiqueList.add(new Historique(agentPrevu.getIdAgent(), dateRotation, statut, motif, remplacant));
             }
 
-            // Avancer dans la rotation circulaire
             positionActuelle = (agentList.indexOf(agentDisponible) + 1) % agentList.size();
-
-            // Passer à la prochaine date valide
             dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
         }
 
-        System.out.println("Assignation terminée avec succès pour la date du : "+date + " qui commencera le : " +dateRotation);
-
+        System.out.println("✅ Assignation terminée avec succès pour la date : " + date);
     }
+
 
     //La Rotation automatique :
     public void planifierRotationAuto() {
         LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
 
-        for (int i = 0; i < agentList.size(); i++) {
-            boolean verif = true;
-            for (Historique hist:historiqueList){
-                if ( (agentList.get(i).getIdAgent() == hist.getIdAgent()) && (hist.getDateRotation().equals(dateRotation) ||hist.getDateRotation().isAfter(LocalDate.now())) ){
-                    verif=false;
-                    System.out.println("Agent Existe déjà !!!");
-                    break;
-                }
-            }
-            // L’agent qui devait normalement faire le tour
-            Agent agentPrevu = agentList.get(positionActuelle);
+        int rotationsAjoutees = 0;
 
-            // Trouver un agent disponible pour cette date
+        while (rotationsAjoutees < agentList.size()) {
+
+            // Vérifie si une rotation existe déjà à cette date
+            LocalDate finaldateRot = dateRotation;
+            boolean dateDejaPlanifiee = historiqueList.stream()
+                    .anyMatch(h -> h.getDateRotation().equals(finaldateRot));
+            if (dateDejaPlanifiee) {
+                dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+                continue;
+            }
+
+            Agent agentPrevu = agentList.get(positionActuelle);
             Agent agentDisponible = trouveAgentDisponible(dateRotation);
 
             if (agentDisponible == null) {
-                System.out.println("Aucun agent n'est disponible pour la date " + dateRotation + " !");
+                System.out.println("❌ Aucun agent disponible pour le " + dateRotation);
                 break;
             }
 
-            // Déterminer le statut du tour
-            String statut = agentDisponible.equals(agentPrevu) ? "En cour" : "Indisponible";
+            String statut = agentDisponible.equals(agentPrevu) ? "En cours" : "Indisponible";
             int remplacant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
+
             String motif = "Pas de motif";
-            if (remplacant!=0){
-                for (Indisponibilite list:agentPrevu.indisponibiliteList){
-                    if (list.getDateIndisponible().equals(dateRotation) && list.getId() == agentPrevu.getIdAgent()){
-                        motif = list.getMotif();
+            if (!statut.equals("En cours")) {
+                for (Indisponibilite indispo : agentPrevu.indisponibiliteList) {
+                    if (indispo.getDateIndisponible().equals(dateRotation)) {
+                        motif = indispo.getMotif();
+                        break;
                     }
                 }
             }
 
-            if (verif){
+            historiqueList.add(new Historique(
+                    agentPrevu.getIdAgent(),
+                    dateRotation,
+                    statut,
+                    motif,
+                    remplacant
+            ));
 
-                // Ajouter à l’historique
-                historiqueList.add(new Historique(agentPrevu.getIdAgent(),dateRotation,statut,motif,remplacant));
-
-            }
-
-            // Avancer dans la rotation circulaire
+            // Rotation circulaire
             positionActuelle = (agentList.indexOf(agentDisponible) + 1) % agentList.size();
-            // Passer à la prochaine date valide
             dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
-
+            rotationsAjoutees++;
         }
 
-        System.out.println("Assignation terminée avec succès !");
+        System.out.println("✅ Rotation planifiée avec succès !");
     }
 
 
+
+    //Apres le signalement d'indiponibilité d'un agent :
+    public void planifierRotationAutoDepuis(LocalDate dateDebut) {
+        // ✅ Filtrer les historiques à conserver : tout ce qui est AVANT la date donnée
+        historiqueList.removeIf(h -> !h.getDateRotation().isBefore(dateDebut));
+
+        // ✅ Garder trace des agents déjà passés
+        Set<Integer> agentsDéjàPlanifiés = new HashSet<>();
+        for (Historique h : historiqueList) {
+            agentsDéjàPlanifiés.add(h.getIdAgent());
+        }
+
+        // 🔁 On recommence à partir de la date donnée
+        LocalDate dateRotation = prochaineDateRotation(dateDebut);
+        int tentatives = 0;
+        int totalAgents = agentList.size();
+
+        while (agentsDéjàPlanifiés.size() < totalAgents && tentatives < totalAgents * 2) {
+            Agent agentPrevu = agentList.get(positionActuelle);
+
+            // Passer s’il est déjà passé
+            if (agentsDéjàPlanifiés.contains(agentPrevu.getIdAgent())) {
+                positionActuelle = (positionActuelle + 1) % totalAgents;
+                tentatives++;
+                continue;
+            }
+
+            Agent agentDisponible = trouveAgentDisponible(dateRotation);
+
+            if (agentDisponible == null) {
+                System.out.println("❌ Aucun agent disponible pour la date " + dateRotation);
+                break;
+            }
+
+            // 🟢 Déterminer le statut
+            boolean memePersonne = agentPrevu.equals(agentDisponible);
+            String statut = memePersonne ? "En cours" : "Indisponible";
+            int idRemplacant = memePersonne ? -1 : agentDisponible.getIdAgent();
+
+            // 📝 Récupérer motif si remplacement
+            String motif = "Pas de motif";
+            if (!memePersonne) {
+                for (Indisponibilite ind : agentPrevu.indisponibiliteList) {
+                    if (ind.getDateIndisponible().equals(dateRotation)) {
+                        motif = ind.getMotif();
+                        break;
+                    }
+                }
+            }
+
+            // ✅ Ajouter à l’historique
+            historiqueList.add(new Historique(
+                    agentPrevu.getIdAgent(),
+                    dateRotation,
+                    statut,
+                    motif,
+                    idRemplacant
+            ));
+
+            // ✅ Marquer comme planifié
+            agentsDéjàPlanifiés.add(agentPrevu.getIdAgent());
+
+            // 🔁 Avancer dans la rotation
+            positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
+            dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+            tentatives++;
+        }
+
+        System.out.println("✅ Nouvelle rotation planifiée à partir de " + dateDebut);
+    }
+
+    //Pour voir les rotation a venir en foonction de nombre de semaines :
     public void afficherRotationAvenir(int nombreSemaines) {
         if (agentList.isEmpty()) {
-            System.out.println("Aucun agent disponible pour la rotation.");
+            System.out.println("❌ Aucun agent enregistré.");
             return;
         }
 
-        LocalDate aujourdhui = LocalDate.now();
-        System.out.println("Calendrier des rotations à venir (" + nombreSemaines + " semaines):");
-        System.out.println("----------------------------------------");
+        System.out.println("\n📆 PROCHAINES ROTATIONS (" + nombreSemaines + " semaines)\n");
+        System.out.println("--------------------------------------------------------------");
+        System.out.printf("| %-12s | %-20s | %-10s |\n", "Date", "Agent Assigné", "Disponibilité");
+        System.out.println("--------------------------------------------------------------");
+
+        LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
+        int currentPosition = positionActuelle;
+
+        Set<LocalDate> datesDéjàMontrées = new HashSet<>();
 
         for (int i = 0; i < nombreSemaines; i++) {
-            LocalDate dateRotation = prochaineDateRotation(aujourdhui.plusWeeks(i));
-            Agent agent = trouveAgentDisponible(dateRotation);
-
-            if (agent != null) {
-                System.out.printf("Semaine du %s: %s %s (%s)%n",
-                        dateRotation,
-                        agent.getPrenom(),
-                        agent.getNom(),
-                        agent.getEmail());
-
-                // Mettre à jour la position actuelle pour la prochaine rotation
-                positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
-
-                // Enregistrer dans l'historique
-                historiqueList.add(new Historique(
-                        agent.getIdAgent(),        // idAgent
-                        dateRotation,        // dateRotation
-                        "Planifié",         // statut
-                        "Rotation normale",  // motif
-                        -1                   // idAgentRemp (aucun remplaçant)
-                ));
-            } else {
-                System.out.printf("Semaine du %s: Aucun agent disponible%n", dateRotation);
+            // Trouver la prochaine date unique
+            while (datesDéjàMontrées.contains(dateRotation)) {
+                dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
             }
+
+            Agent agent = trouveAgentDisponible(dateRotation);
+            String nom = (agent != null) ? agent.getPrenom() + " " + agent.getNom() : "Aucun disponible";
+            String dispo = (agent != null) ? "✅" : "❌";
+
+            System.out.printf("| %-12s | %-20s | %-10s |\n", dateRotation, nom, dispo);
+
+            // Enregistrer la date utilisée pour éviter les doublons
+            datesDéjàMontrées.add(dateRotation);
+
+            // Préparer la date suivante
+            dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+
+            // Avancer virtuellement la rotation sans modifier positionActuelle globale
+            currentPosition = (currentPosition + 1) % agentList.size();
         }
 
+        System.out.println("--------------------------------------------------------------");
     }
 
-
+    // Trouve le nom complet d’un agent par ID
+    private String getNomParId(int id) {
+        for (Agent a : agentList) {
+            if (a.getIdAgent() == id) {
+                return a.getPrenom() + " " + a.getNom();
+            }
+        }
+        return "Inconnu";
+    }
 
     public void afficheHistorique() {
-
         if (historiqueList.isEmpty()) {
-            System.out.println(" Aucun historique disponible pour le moment.");
+            System.out.println("❌ Aucun historique disponible.");
             return;
         }
 
-        System.out.println("\n HISTORIQUE DES ROTATIONS\n");
-        System.out.println("----------------------------------------------------------------------------------------------------");
-        //On utilise des spécificateurs de format pour organiser les colonnes a l'affichage
-        // % debut du format; - aligner a gauche; 15 nombre de caractere; s le type de contenu
-        System.out.printf("|%-15s | %-25s | %-15s | %-20s | %-20s|\n", " Date", " Agent Prévu", " Statut", " Remplaçant","Motif");
-        System.out.println("----------------------------------------------------------------------------------------------------");
+        System.out.println("\n📚 HISTORIQUE DES ROTATIONS 📚\n");
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
+        System.out.printf("| %-12s | %-20s | %-12s | %-20s | %-20s |\n", "Date", "Agent Prévu", "Statut", "Remplaçant", "Motif");
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
 
         for (Historique h : historiqueList) {
             String date = h.getDateRotation().toString();
-            String agentNom = "";
-            String remplacant = "-";
-            String motif = "-";
-            String statut = "" ;
-            for (Agent agent:agentList){
-                if (agent.getIdAgent() == h.getIdAgent()){
-                    agentNom = agent.getNom()+" "+agent.getPrenom();
-                    if (LocalDate.now().isBefore(h.getDateRotation())){
-                        statut = "A venir";
-                    } else if (LocalDate.now().isAfter(h.getDateRotation())) {
-                        statut = "Deja Effectué";
-                    }else {
-                        statut = "En cour";
-                    }
-                }else if (agent.getIdAgent() == h.getIdAgentRemp()){
-                    remplacant = agent.getNom()+" "+agent.getPrenom();
-                    motif = h.getMotif();
-                    statut = "Remplaçer ->";
-                }
+            String agentNom = getNomParId(h.getIdAgent());
+            String remplacant = h.getIdAgentRemp() != -1 ? getNomParId(h.getIdAgentRemp()) : "-";
+            String motif = h.getMotif() != null ? h.getMotif() : "-";
+
+            String statut;
+            if (h.getIdAgentRemp() != -1) {
+                statut = "Remplacé";
+            } else if (h.getDateRotation().isAfter(LocalDate.now())) {
+                statut = "À venir";
+            } else if (h.getDateRotation().isEqual(LocalDate.now())) {
+                statut = "En cours";
+            } else {
+                statut = "Effectué";
             }
-            System.out.printf("| %-15s | %-25s | %-15s | %-20s | %-20s |\n", date, agentNom, statut, remplacant,motif);
-            System.out.println("----------------------------------------------------------------------------------------------------");
+
+            System.out.printf("| %-12s | %-20s | %-12s | %-20s | %-20s |\n", date, agentNom, statut, remplacant, motif);
         }
+
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
     }
+
 
 }
 

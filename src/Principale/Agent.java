@@ -76,24 +76,68 @@ import java.util.List;
 
 
         //Pour methode pour signalerIndisponibilite des agents :
-        public void signalerIndisponibilite(String motif,int idAgent, LocalDate date,AdministrateurRH admin){
-            int i = 0;
-            for (Agent agent: admin.agentList){
-                if (agent.getIdAgent() == idAgent){
-                    agent.ajoutIndisponible(motif,date,idAgent);
-                    System.out.println("Indisponibilité ajoutée pour le " + date);
+        public void signalerIndisponibilite(String motif, int idAgent, LocalDate date, AdministrateurRH admin) {
+            for (Agent agent : admin.agentList) {
+                if (agent.getIdAgent() == idAgent) {
+                    agent.ajoutIndisponible(motif, date, idAgent);
+                    System.out.println("✅ Indisponibilité ajoutée pour le " + date);
 
-                    admin.historiqueList.removeIf(historique -> historique.getDateRotation().isAfter(date.minusDays(1)));
-                    admin.positionActuelle = i;
-                    admin.planifierRotationAuto();
-                    break;
+                    // Supprimer uniquement l’historique de cet agent à cette date précise
+                    admin.historiqueList.removeIf(h ->
+                            h.getIdAgent() == agent.getIdAgent() &&
+                                    h.getDateRotation().equals(date)
+                    );
+
+                    // Replanifier uniquement à partir de cette date
+                    admin.planifierRotationAutoDepuis(date.minusDays(1));
+                    return;
                 }
-                i++;
+            }
 
+            System.out.println("❌ Agent non trouvé.");
+        }
+
+    public void signalerIndisponibiliteEtReplanifier(String motif, int idAgent, LocalDate date) {
+        // Vérifier si la date est dans le passé
+        if (date.isBefore(LocalDate.now())) {
+            System.out.println("❌ Erreur : Impossible de déclarer une indisponibilité pour une date passée !");
+            return;
+        }
+
+        // Chercher l'agent concerné
+        Agent agentCible = null;
+        for (Agent agent : admin.agentList) {
+            if (agent.getIdAgent() == idAgent) {
+                agentCible = agent;
+                break;
             }
         }
 
-        // methode voir tour prochaine
+        if (agentCible == null) {
+            System.out.println("❌ Erreur : Agent non trouvé.");
+            return;
+        }
+
+        // Ajouter l’indisponibilité
+        agentCible.ajoutIndisponible(motif, date, idAgent);
+        System.out.println("✅ Indisponibilité ajoutée pour " + date);
+
+        // Supprimer uniquement les historiques à partir de cette date
+        admin.historiqueList.removeIf(h -> !h.getDateRotation().isBefore(date));
+
+        // On remet la position à l’agent concerné (s’il existe encore)
+        admin.positionActuelle = admin.agentList.indexOf(agentCible);
+        if (admin.positionActuelle == -1) {
+            admin.positionActuelle = 0;
+        }
+
+        // Replanifier uniquement les dates à venir
+        admin.planifierRotationAutoDepuis(date);
+    }
+
+
+
+    // methode voir tour prochaine
         public Historique voirTourProchaine(int idAgent,AdministrateurRH admin) {
             for (Historique h: admin.historiqueList){
                 if (h.getIdAgent() == idAgent && h.getDateRotation().isAfter(LocalDate.now())){

@@ -5,7 +5,9 @@ import Principale.Agent;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class GestionAgent {
@@ -35,83 +37,120 @@ public class GestionAgent {
         return valeur;
     }
     private void choix() {
-        int choix = -1;
-        while (choix != 0) {
-            System.out.println("\n=== MENU - GESTION DES AGENTS ===");
+        int choix;
+
+        do {
+            System.out.println("\n========= 📁 GESTION DES AGENTS =========");
             System.out.println("1. ➕ Ajouter un agent");
             System.out.println("2. 📄 Lister les agents");
-            System.out.println("3. 🗑️ Supprimer un agent");
-            System.out.println("0. 🔙 Retour au menu principal");
-
-            choix = lireEntier();
+            System.out.println("3. ❌ Retirer un agent");
+            System.out.println("0. 🔙 Retour à l’accueil");
+            System.out.print("Faites un choix : ");
+            choix = sc.nextInt();
+            sc.nextLine(); // clean buffer
 
             switch (choix) {
-                case 1 ->this.ajoutAgent();
-                case 2 -> this.listAgent();
-                case 3 -> this.retireAgent();
-                case 0 -> System.out.println("Retour au menu principal...");
-                default -> System.out.println("❌ Option invalide. Essayez encore.");
+                case 1 -> ajoutAgent();
+                case 2 -> listAgent();
+                case 3 -> retirerAgent();
+                case 0 -> System.out.println("🔙 Retour à l'accueil...");
+                default -> System.out.println("❌ Choix invalide. Réessayez.");
             }
-        }
+        } while (choix != 0);
     }
 
-    private void pause(){
-        System.out.print("Appuyez sur Entrée pour continuer...");
-        sc.nextLine(); // vider éventuelle ligne précédente
-        sc.nextLine();
-    }
     private void ajoutAgent() {
-        System.out.print("Combien d’agents voulez-vous enregistrer ? : ");
+        System.out.print("🔹 Combien d’agents voulez-vous enregistrer ? : ");
         int nbAgent = sc.nextInt();
-        int nbrAgent = admin.agentList.size();
+        sc.nextLine(); // vider le buffer
+
+        List<Agent> agentsAjoutes = new ArrayList<>();
+
         for (int i = 0; i < nbAgent; i++) {
-            if (i!=0){
-                System.out.println("--------------------------------------------------------");
+            System.out.println("\n🧾 Agent #" + (i + 1));
+
+            System.out.print("👉 Prénom : ");
+            String prenom = sc.nextLine().trim();
+
+            System.out.print("👉 Nom : ");
+            String nom = sc.nextLine().trim();
+
+            System.out.print("📧 Email : ");
+            String email = sc.nextLine().trim().toLowerCase();
+
+            // Vérification email:
+            while (!admin.emailEstValide(email) || admin.emailExisteDeja(email)){
+                System.out.print("📧 Email : ");
+                email = sc.nextLine().trim().toLowerCase();
             }
-            System.out.print("Saisir le nom de l'agent " + (i + 1) + " : ");
-            sc.nextLine();
-            String nom = sc.nextLine();
-            System.out.print("Saisir le prenom de l'agent " + nom + " : ");
-            String prenom = sc.nextLine();
-            String email;
-            do{
-                System.out.print("Saisir l'email de l'agent " + nom +" " + prenom  + " : ");
-                email = sc.next();
-            }while (!admin.emailEstValide(email) || admin.emailExisteDeja(email));
-            nbrAgent++;
-            admin.ajoutAgent(nbrAgent,nom,prenom,email);
+
+            int nouvelId = admin.agentList.isEmpty() ? 1 : admin.agentList.get(admin.agentList.size() - 1).getIdAgent() + 1;
+            Agent agent = new Agent(nouvelId, nom, prenom, email);
+            admin.ajoutAgent(nouvelId,nom,prenom,email);
+            agentsAjoutes.add(agent);
+
+            System.out.println("✅ Agent ajouté : " + prenom + " " + nom);
         }
 
-        System.out.println(nbAgent + (nbAgent > 1 ? " agents ont été ajoutés avec succès !" : " agent a été ajouté avec succès !"));
-        System.out.println("Voulez vous faire une rotation Automatique en fonction de la date d'aujourd'hui (Oui/Non) ?");
-        String reponse = sc.next();
-        if (reponse.equals("oui")||reponse.equals("OUI") || reponse.equals("Oui")){
-            admin.planifierRotationAuto();
+        if (agentsAjoutes.isEmpty()) {
+            System.out.println("\n❌ Aucun agent n’a été ajouté.");
+        } else {
+            System.out.println("\n✅ Total ajouté : " + agentsAjoutes.size() + " agent(s)");
         }
-        this.pause();
-    }
 
-    private void listAgent(){
-        System.out.println("\nListe des agents :");
-        System.out.printf("%-25s | %-20s | %-25s\n", " Prenom de l'agent", " Nom de L'agent", " Email de l'Agent");
-        System.out.println("____________________________________________________________________");
-        for (Agent ag : admin.agentList) {
-            System.out.printf("%-25s | %-20s | %-25s\n",ag.getPrenom(),ag.getNom(), ag.getEmail());
-            System.out.println("____________________________________________________________________");
+        // Optionnel : déclencher la rotation
+        System.out.print("\n📌 Voulez-vous replanifier la rotation maintenant ? (oui/non) : ");
+        String reponse = sc.nextLine().trim().toLowerCase();
+        if (reponse.equals("oui") || reponse.equals("o")) {
+            admin.planifierRotationAutoDepuis(LocalDate.now());
         }
-        this.pause();
+
+        this.menu();// retour au menu
     }
 
 
-    private void retireAgent() {
-        System.out.print("Entrez l'email de l'agent à retirer : ");
-        String valeur = sc.next();
-        if (admin.retireAgent(valeur)){
-            System.out.println("Agent Supprimer avec succès !!");
-        }else{
-            System.out.println("Email saisi est soit incorrect soit inexistant dans la base. Veillez Reassayez plus tard!");
+    private void listAgent() {
+        List<Agent> agents = admin.agentList;
+
+        if (agents.isEmpty()) {
+            System.out.println("\n❌ Aucun agent n’est encore enregistré.");
+            this.menu();
+            return;
         }
-        pause();
+
+        System.out.println("\n📋 LISTE DES AGENTS ENREGISTRÉS");
+        System.out.println("---------------------------------------------------------------------");
+        System.out.printf("| %-4s | %-20s | %-20s |\n", "ID", "Nom Complet", "Email");
+        System.out.println("---------------------------------------------------------------------");
+
+        for (Agent a : agents) {
+            String nomComplet = a.getPrenom() + " " + a.getNom();
+            System.out.printf("| %-4d | %-20s | %-20s |\n", a.getIdAgent(), nomComplet, a.getEmail());
+            System.out.println("---------------------------------------------------------------------");
+        }
+
+        this.menu(); // retour au menu
+    }
+
+
+
+    private void retirerAgent() {
+        System.out.print("📧 Entrez l’email de l’agent à retirer : ");
+        String email = sc.nextLine().trim().toLowerCase();
+        admin.emailEstValide(email);
+        if (admin.retireAgent(email)) {
+            System.out.println("✅ Agent retiré avec succès !");
+        } else {
+            System.out.println("❌ Aucun agent trouvé avec cet email.");
+        }
+
+        this.menu(); // retour au menu
+    }
+
+    // ajoutAgent() et listAgent() sont déjà améliorées
+    private void menu() {
+        System.out.print("🔁 Appuyez sur Entrée pour revenir au menu...");
+        sc.nextLine();
     }
 
 }
