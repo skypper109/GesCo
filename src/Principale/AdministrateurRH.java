@@ -209,7 +209,7 @@ public class AdministrateurRH  extends User{
             String statut = agentDisponible.equals(agentPrevu) ? "En cours" : "Indisponible";
             int remplacant = statut.equals("Indisponible") ? agentDisponible.getIdAgent() : 0;
 
-            String motif = "Pas de motif";
+            String motif = "-";
             if (!statut.equals("En cours")) {
                 for (Indisponibilite indispo : agentPrevu.indisponibiliteList) {
                     if (indispo.getDateIndisponible().equals(dateRotation)) {
@@ -241,12 +241,12 @@ public class AdministrateurRH  extends User{
     //Apres le signalement d'indiponibilité d'un agent :
     public void planifierRotationAutoDepuis(LocalDate dateDebut) {
         // ✅ Filtrer les historiques à conserver : tout ce qui est AVANT la date donnée
-        historiqueList.removeIf(h -> !h.getDateRotation().isBefore(dateDebut));
+        historiqueList.removeIf(h -> h.getDateRotation().isAfter(dateDebut.minusDays(1)));
 
         // ✅ Garder trace des agents déjà passés
-        Set<Integer> agentsDéjàPlanifiés = new HashSet<>();
+        List<Integer> agentsPlanifies = new ArrayList<>();
         for (Historique h : historiqueList) {
-            agentsDéjàPlanifiés.add(h.getIdAgent());
+            agentsPlanifies.add(h.getIdAgent());
         }
 
         // 🔁 On recommence à partir de la date donnée
@@ -254,11 +254,11 @@ public class AdministrateurRH  extends User{
         int tentatives = 0;
         int totalAgents = agentList.size();
 
-        while (agentsDéjàPlanifiés.size() < totalAgents && tentatives < totalAgents * 2) {
+        while (agentsPlanifies.size() < totalAgents && tentatives < totalAgents * 2) {
             Agent agentPrevu = agentList.get(positionActuelle);
 
             // Passer s’il est déjà passé
-            if (agentsDéjàPlanifiés.contains(agentPrevu.getIdAgent())) {
+            if (agentsPlanifies.contains(agentPrevu.getIdAgent())) {
                 positionActuelle = (positionActuelle + 1) % totalAgents;
                 tentatives++;
                 continue;
@@ -277,7 +277,7 @@ public class AdministrateurRH  extends User{
             int idRemplacant = memePersonne ? -1 : agentDisponible.getIdAgent();
 
             // 📝 Récupérer motif si remplacement
-            String motif = "Pas de motif";
+            String motif = "-";
             if (!memePersonne) {
                 for (Indisponibilite ind : agentPrevu.indisponibiliteList) {
                     if (ind.getDateIndisponible().equals(dateRotation)) {
@@ -297,7 +297,7 @@ public class AdministrateurRH  extends User{
             ));
 
             // ✅ Marquer comme planifié
-            agentsDéjàPlanifiés.add(agentPrevu.getIdAgent());
+            agentsPlanifies.add(agentPrevu.getIdAgent());
 
             // 🔁 Avancer dans la rotation
             positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;

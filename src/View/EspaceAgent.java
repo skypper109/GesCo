@@ -62,11 +62,12 @@ public class EspaceAgent {
                         LocalDate date = LocalDate.parse(sc.nextLine());
                         System.out.print("✍️ Motif : ");
                         String motif = sc.nextLine();
-                        connected.getFirst().signalerIndisponibiliteEtReplanifier(motif,agentID, date);
+                        connected.getFirst().signalerIndisponibiliteEtReplanifier(motif,agentID, date,admin);
                     } catch (Exception e) {
                         break;
                     }
                 case 2:
+                    System.out.println("Id de L'agent est : "+agentID);
                     connected.getFirst().voirHistorique(agentID,admin);
                     this.pause();
                     break;

@@ -97,7 +97,7 @@ import java.util.List;
             System.out.println("❌ Agent non trouvé.");
         }
 
-    public void signalerIndisponibiliteEtReplanifier(String motif, int idAgent, LocalDate date) {
+    public void signalerIndisponibiliteEtReplanifier(String motif, int idAgent, LocalDate date,AdministrateurRH admin) {
         // Vérifier si la date est dans le passé
         if (date.isBefore(LocalDate.now())) {
             System.out.println("❌ Erreur : Impossible de déclarer une indisponibilité pour une date passée !");
@@ -122,12 +122,9 @@ import java.util.List;
         agentCible.ajoutIndisponible(motif, date, idAgent);
         System.out.println("✅ Indisponibilité ajoutée pour " + date);
 
-        // Supprimer uniquement les historiques à partir de cette date
-        admin.historiqueList.removeIf(h -> !h.getDateRotation().isBefore(date));
-
         // On remet la position à l’agent concerné (s’il existe encore)
-        admin.positionActuelle = admin.agentList.indexOf(agentCible);
-        if (admin.positionActuelle == -1) {
+        admin.positionActuelle = admin.agentList.indexOf(agentCible)+1;
+        if (admin.positionActuelle > admin.agentList.size() ) {
             admin.positionActuelle = 0;
         }
 
@@ -149,14 +146,16 @@ import java.util.List;
         // methode voir historique
         public void voirHistorique(int idAgent,AdministrateurRH admin) {
             for (Historique h : admin.historiqueList) {
-                if ( ((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isBefore(LocalDate.now()) ) ) {
+                if ( ((h.getIdAgent() == idAgent && h.getIdAgentRemp()==-1) &&  h.getDateRotation().isBefore(LocalDate.now()) ) ) {
                     System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
-                } else if (((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isAfter(LocalDate.now()) ) ) {
+                    System.out.println("-------------------------------------------------------------------");
+                } else if (((h.getIdAgent() == idAgent && h.getIdAgentRemp()==-1) &&  h.getDateRotation().isAfter(LocalDate.now()) ) ) {
                     System.out.println("tu dois servir le petit dejeuner le : " + h.getDateRotation());
+                    System.out.println("-------------------------------------------------------------------");
                 } else if (h.getIdAgentRemp() == idAgent){
                     System.out.println("tu as remplacé un agent le  : " + h.getDateRotation());
+                    System.out.println("-------------------------------------------------------------------");
                 }
-                System.out.println("-------------------------------------------------------------------");
             }
         }
 
