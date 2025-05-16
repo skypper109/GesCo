@@ -9,7 +9,7 @@ public class User {
     private String email;
     private String password;
     public  List<User> userList;
-    private static String role;
+    private  String role;
 
     public User(String email, String password, String role) {
         this.email = email;
@@ -30,7 +30,7 @@ public class User {
         return userList;
     }
 
-    public static String getRole() {
+    public  String getRole() {
         return role;
     }
 

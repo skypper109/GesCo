@@ -140,7 +140,7 @@ import java.util.List;
     // methode voir tour prochaine
         public Historique voirTourProchaine(int idAgent,AdministrateurRH admin) {
             for (Historique h: admin.historiqueList){
-                if (h.getIdAgent() == idAgent && h.getDateRotation().isAfter(LocalDate.now())){
+                if (h.getIdAgent() == idAgent && (h.getDateRotation().isAfter(LocalDate.now())||h.getDateRotation().isEqual(LocalDate.now())) ){
                     return h;
                 }
             }
@@ -173,6 +173,9 @@ import java.util.List;
                     return;
                 } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
                     System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
+                    return;
+                }else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(LocalDate.now())) {
+                    System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner Aujourd'hui");
                     return;
                 }
             }

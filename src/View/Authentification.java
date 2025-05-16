@@ -23,8 +23,15 @@ public class Authentification {
 
 
         if (admin.authentifier(email, password)) {
-            System.out.println("✅ Connexion réussie en tant que " + User.getRole());
-            if (User.getRole().equals("Admin")) {
+            String role = "";
+            for (User user : admin.userList) {
+                if (user.getEmail().equals(email) && user.getPassword().equals(password)){
+                    role = user.getRole();
+                    break;
+                }
+            }
+            System.out.println("✅ Connexion réussie en tant que " + role);
+            if (role.equals("Admin")) {
                 new Accueil().espaceAdmin();
                 int choix;
                 System.out.println("\n=========[ 🟢 ESPACE ADMIN - GESTION DES AGENTS ]=========");
@@ -48,7 +55,7 @@ public class Authentification {
                 }while (choix != 0);
                 System.out.println("Deconnexion...");
             }
-            else if (User.getRole().equals("Agent")) {
+            else if (role.equals("Agent")) {
                 new Accueil().espaceAgent();
                 new EspaceAgent(admin, email);
             }
