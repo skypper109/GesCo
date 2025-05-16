@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
@@ -310,43 +311,62 @@ public class AdministrateurRH  extends User{
     //Pour voir les rotation a venir en foonction de nombre de semaines :
     public void afficherRotationAvenir(int nombreSemaines) {
         if (agentList.isEmpty()) {
-            System.out.println("❌ Aucun agent enregistré.");
+            System.out.println("❌ Aucun agent disponible pour la rotation.");
             return;
         }
-
-        System.out.println("\n📆 PROCHAINES ROTATIONS (" + nombreSemaines + " semaines)\n");
-        System.out.println("--------------------------------------------------------------");
-        System.out.printf("| %-12s | %-20s | %-10s |\n", "Date", "Agent Assigné", "Disponibilité");
-        System.out.println("--------------------------------------------------------------");
+        List<Historique> historiqueList2 = new ArrayList<>();
 
         LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
-        int currentPosition = positionActuelle;
+        Set<LocalDate> datesDejaPlanifiees = historiqueList.stream()
+                .map(Historique::getDateRotation)
+                .collect(Collectors.toSet());
 
-        Set<LocalDate> datesDéjàMontrées = new HashSet<>();
+        System.out.println("📅 Calendrier des rotations à venir (" + nombreSemaines + " semaines)");
+        System.out.println("---------------------------------------------------");
 
-        for (int i = 0; i < nombreSemaines; i++) {
-            // Trouver la prochaine date unique
-            while (datesDéjàMontrées.contains(dateRotation)) {
+        int rotationsAjoutees = 0;
+        int tentativeMax = nombreSemaines * 3;  // 🔐 Sécurité anti-boucle infinie
+
+        while (rotationsAjoutees < nombreSemaines && tentativeMax > 0) {
+            tentativeMax--;
+
+            // Sauter si la date est déjà utilisée
+            if (datesDejaPlanifiees.contains(dateRotation)) {
                 dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+                continue;
             }
 
             Agent agent = trouveAgentDisponible(dateRotation);
-            String nom = (agent != null) ? agent.getPrenom() + " " + agent.getNom() : "Aucun disponible";
-            String dispo = (agent != null) ? "✅" : "❌";
+            if (agent != null) {
+                System.out.printf("✅ Semaine du %s: %s %s (%s)%n",
+                        dateRotation,
+                        agent.getPrenom(),
+                        agent.getNom(),
+                        agent.getEmail()
+                );
 
-            System.out.printf("| %-12s | %-20s | %-10s |\n", dateRotation, nom, dispo);
+                // Enregistrer dans l'historique
+                historiqueList2.add(new Historique(
+                        agent.getIdAgent(),
+                        dateRotation,
+                        "Planifié",
+                        "Rotation normale",
+                        -1 // aucun remplaçant
+                ));
 
-            // Enregistrer la date utilisée pour éviter les doublons
-            datesDéjàMontrées.add(dateRotation);
+                positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
+                rotationsAjoutees++;
 
-            // Préparer la date suivante
+            } else {
+                System.out.printf("⚠️ Semaine du %s: Aucun agent disponible%n", dateRotation);
+            }
+
+            // Avancer la date quoiqu’il arrive
             dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
-
-            // Avancer virtuellement la rotation sans modifier positionActuelle globale
-            currentPosition = (currentPosition + 1) % agentList.size();
         }
 
-        System.out.println("--------------------------------------------------------------");
+        System.out.println("---------------------------------------------------");
+        historiqueList2 = null;
     }
 
     // Trouve le nom complet d’un agent par ID
