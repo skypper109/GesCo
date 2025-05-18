@@ -2,6 +2,7 @@ package GestionDB.Tables;
 
 import GestionDB.Connexion;
 import Principale.User;
+import View.EmailService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -70,5 +71,20 @@ public class Users {
             System.out.println("Suppression de user dans la base de donnée n'a pas aboutie!");
         }
         return false;
+    }
+
+    //Pour changer le mot de passe dans la table users:
+    public void updatePwd(String password,String email){
+        String sql = "UPDATE users SET password=? WHERE email=?";
+        try (Connection con = new Connexion().connect();
+             PreparedStatement ptr = con.prepareStatement(sql)){
+            ptr.setString(1,password);
+            ptr.setString(2,email);
+            ptr.executeUpdate();
+            System.out.println("Mot de passe changer avec succès");
+            new EmailService().envoyerEmail(email,"Changement de mot de passe dans ANKA-DRAKAA","Votre mot de passe à ete changer avec succès. Votre nouveau mot de passe est : "+password);
+        }catch (SQLException e){
+            System.out.println("Erreur lors de modification de ton mot de passe !!! ");
+        }
     }
 }

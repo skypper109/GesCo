@@ -4,6 +4,7 @@ import GestionDB.Tables.Agents;
 import Principale.AdministrateurRH;
 import Principale.Agent;
 import Principale.Historique;
+import Principale.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,9 +16,11 @@ public class EspaceAgent {
     private final AdministrateurRH admin;
     String email;
     Scanner sc = new Scanner(System.in);
-    public EspaceAgent( AdministrateurRH admin,String email) {
+    private User user ;
+    public EspaceAgent( AdministrateurRH admin,String email,User user) {
         this.admin = admin;
         this.email = email;
+        this.user = user;
         this.afficheAgent();
     }
     public void afficheAgent(){
@@ -25,9 +28,33 @@ public class EspaceAgent {
         List<Agent> connected = new ArrayList<>();
         int agentID = 0;
 
+
         for (Agent agent:listeAgent){
             if (agent.getEmail().equals(email)){
                 agentID = agent.getIdAgent();
+                boolean inBoucle=false;
+                while (user.getEmail().equals(email) && user.getPassword().equals("agent1234")){
+                    //Changer le mot de passe obligatoirement :
+                    if (!inBoucle){
+                        System.out.println("-------------------[ Changer le mot de passe par defaut ]-----------------");
+                    }
+                    System.out.print("Saisi le nouveau Mot de passe : ");
+                    String password = sc.nextLine();
+                    if (password.isBlank() || password.length()<8){
+                        System.out.println("C'est pas un bon mot de passe ca doit depacer 8 caracteres !!");
+                        inBoucle=true;
+                    }else {
+                        user.setPassword(password,email);
+                        break;
+                    }
+
+                }
+                List<Agent> agentCon = new Agents().getAgent(agentID);
+                if (agentCon.getFirst().getEtat()==0){
+                    System.out.println("-------------------[ Desolé votre compte est en etat Desactivé Veillez contacter l'Admin ]-----------------");
+                    pause();
+                    break;
+                }
                 connected.add(agent);
                 Agent agentConnected = new Agent(agentID,agent.getNom(),agent.getPrenom(), agent.getEmail());
 

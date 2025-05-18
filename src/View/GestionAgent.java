@@ -44,7 +44,7 @@ public class GestionAgent {
             System.out.println("\n=== MENU - GESTION DES AGENTS ===");
             System.out.println("1. ➕ Ajouter un agent");
             System.out.println("2. 📄 Lister les agents");
-            System.out.println("3. 🗑️ Supprimer un agent");
+            System.out.println("3. 🗑️ Désactiver un agent");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier();
@@ -77,13 +77,13 @@ public class GestionAgent {
             String email = sc.nextLine().trim().toLowerCase();
 
             // Vérification email:
-            while (!admin.emailEstValide(email) || admin.emailExisteDeja(email)){
+            while (!admin.ajoutAgent(nom,prenom,email)){
+                System.out.println("Ressaisi l'email !");
                 System.out.print("📧 Email : ");
                 email = sc.nextLine().trim().toLowerCase();
             }
 
             nbrAgent++;
-            admin.ajoutAgent(nom,prenom,email);
 
             System.out.println("✅ Agent ajouté : " + prenom + " " + nom);
             service.envoyerEmail(email,"Creation de votre compte sur ANKA-DRAKAA","Votre compte a ete créer avec succes votre mot de passe est: agent1234 ");
@@ -121,12 +121,12 @@ public class GestionAgent {
 
 
     private void retireAgent() {
-        System.out.print("📧 Entrez l’email de l’agent à retirer : ");
+        System.out.print("📧 Entrez l’email de l’agent à désactiver : ");
         sc.nextLine();
         String email = sc.nextLine().trim().toLowerCase();
         admin.emailEstValide(email);
         if (admin.retireAgent(email)) {
-            System.out.println("✅ Agent retiré avec succès !");
+            System.out.println("✅ Agent désactivé avec succès !");
         }else{
             System.out.println("❌ Aucun agent trouvé avec cet email.");
         }

@@ -44,7 +44,7 @@ public class User {
     }
 
     public void setPassword(String password,String email) {
-        User user = userTable.list(email,password);
+        userTable.updatePwd(password,email);
         this.password = password;
     }
     public String getEmail(){

@@ -21,6 +21,7 @@ import java.util.List;
         public Historiques tableHistorique = new Historiques();
         public Agents tableAgent = new Agents();
         public List<Indisponibilite> indisponibiliteList;
+        private int etat ;
         //constructeur
 
         public Agent(int idAgent, String nom, String prenom, String email) {
@@ -30,8 +31,21 @@ import java.util.List;
             this.email = email;
             this.indisponibiliteList = new ArrayList<>();
         }
+    //constructeur
 
-        //getter idAgent
+    public Agent(int idAgent, String nom, String prenom, String email,int etat) {
+        this.idAgent = idAgent;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.etat = etat;
+    }
+
+    public int getEtat() {
+        return etat;
+    }
+
+    //getter idAgent
         public int getIdAgent() {
             return idAgent;
         }

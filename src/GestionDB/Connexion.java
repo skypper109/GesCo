@@ -39,6 +39,7 @@ public class Connexion {
                     idAgent INTEGER PRIMARY KEY AUTOINCREMENT,
                     nom TEXT NOT NULL,
                     prenom TEXT NOT NULL,
+                    etat INTEGER NOT NULL DEFAULT 1,
                     email TEXT UNIQUE
                 );
                 """;
@@ -80,6 +81,12 @@ public class Connexion {
                 );
                 """;
         try(Connection con = connect(); Statement stmt = con.createStatement()) {
+            stmt.execute(sql);
+            stmt.execute(sql2);
+            stmt.execute(sql3);
+            stmt.execute(dropTableHis);
+            stmt.execute(dropTableJF);
+            stmt.execute(dropTableInd);
             stmt.execute(tableAgent);
             stmt.execute(tableAdministrateurRH);
             stmt.execute(tableUser);

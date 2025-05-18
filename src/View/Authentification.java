@@ -55,7 +55,7 @@ public class Authentification {
             }
             else if (user.getRole().equals("Agent")) {
                 new Accueil().espaceAgent();
-                new EspaceAgent(admin, email);
+                new EspaceAgent(admin, email,user);
             }
             else {System.out.println("❌ Rôle non reconnu. Accès refusé.");}
 

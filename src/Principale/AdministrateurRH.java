@@ -68,15 +68,17 @@ public class AdministrateurRH  extends User{
         }
         return false;
     }
-    public void ajoutAgent(String nom, String prenom, String email){
+    public boolean ajoutAgent(String nom, String prenom, String email){
         if (emailEstValide(email) && !emailExisteDeja(email)){
             tableAgent.ajoutAgent(nom,prenom,email);
             userTable.insert(email,"agent1234","Agent");
+            return true;
         }
+        return false;
     }
     //Pour retirer un agent
     public boolean retireAgent(String email){
-        return tableAgent.delAgent(email) && userTable.deleteUser(email);
+        return tableAgent.delAgent(email);
     }
     //Pour l'ajout des jours Fériés
     public void ajoutJourFerie(LocalDate date, String description){

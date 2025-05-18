@@ -29,7 +29,7 @@ public class Agents {
     }
     //Pour lister l'ensemble des agents :
     public List<Agent> allAgent(){
-        String commande = "SELECT * FROM agents";
+        String commande = "SELECT * FROM agents WHERE etat=1";
         try(PreparedStatement stmt = con.prepareStatement(commande)){
             List<Agent> agents = new ArrayList<>();
             var agent = stmt.executeQuery();
@@ -61,7 +61,8 @@ public class Agents {
                         agent.getInt("idAgent"),
                         agent.getString("nom"),
                         agent.getString("prenom"),
-                        agent.getString("email")
+                        agent.getString("email"),
+                        agent.getInt("etat")
                 );
                 agents.add(ag);
             }
@@ -73,13 +74,13 @@ public class Agents {
     }
     //Pour la suppression d'un agent a travers sont email :
     public boolean delAgent(String email){
-        String sql = "DELETE FROM agents WHERE email=?";
+        String sql = "UPDATE agents SET etat=0 WHERE email=?";
         try(PreparedStatement ptr = con.prepareStatement(sql)) {
             ptr.setString(1,email);
             int nbLigne = ptr.executeUpdate();
 
             if (nbLigne > 0) {
-                System.out.println("✅ Agent supprimé avec succès !");
+                System.out.println("✅ Agent desactivé avec succès !");
                 return true;
             } else {
                 System.out.println("❗ Aucun agent trouvé avec cet email.");
