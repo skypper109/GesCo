@@ -6,6 +6,7 @@ import Principale.Agent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,5 +90,23 @@ public class Agents {
         }
         return false;
     }
+
+    public boolean updateAgent(int idAgent,String nom,String prenom,String email){return true;}
+
+    //Pour la methode estDisponible :
+    public boolean estDisponible(LocalDate date,int idAgent){
+        String sql = "SELECT * FROM indisponibilites WHERE idAgent=? AND dateIndisponible=?";
+        try(PreparedStatement ptr = con.prepareStatement(sql)){
+            ptr.setInt(1,idAgent);
+            ptr.setDate(2,java.sql.Date.valueOf(date));
+            var response = ptr.executeQuery();
+            return !response.next();
+        }catch (SQLException e){
+            System.out.println("Erreur lors de la recuperation des dates d'indiponibiliter !!!");
+        }
+        return false;
+    }
+
+    //
 
 }

@@ -1,5 +1,8 @@
 package Principale;
 
+import GestionDB.Tables.Agents;
+import GestionDB.Tables.Historiques;
+import GestionDB.Tables.Indisponibilites;
 import View.ServiceMail;
 
 import java.time.LocalDate;
@@ -15,6 +18,8 @@ import java.util.List;
         private String prenom;
         private String email;
         public AdministrateurRH admin;
+        public Historiques tableHistorique = new Historiques();
+        public Agents tableAgent = new Agents();
         public List<Indisponibilite> indisponibiliteList;
         //constructeur
 
@@ -60,100 +65,115 @@ import java.util.List;
         }
 
 
-        //Pour la methode de l'agent est disponible :
-        public boolean estDisponible(LocalDate date,int idAgent){
-            for (Indisponibilite ind:indisponibiliteList){
-                if (ind.getId() == idAgent && ind.getDateIndisponible().equals(date)){
-                    return false;
-                }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Agent agent = (Agent) obj;
+        return idAgent == agent.idAgent;
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(idAgent);
+    }
+
+
+    //La methode Pour l'indisponibilité :
+    private void ajoutIndisponible(String motif, LocalDate date,int idAgent){
+        new Indisponibilites().addIndisponible(idAgent,motif,date);
+    }
+
+
+    //Pour methode pour signalerIndisponibilite des agents :
+    public void signalerIndisponibiliteEtReplanifier(String motif, int idAgent, LocalDate date,AdministrateurRH admin) {
+        // Vérifier si la date est dans le passé
+        if (date.isBefore(LocalDate.now())) {
+            System.out.println("❌ Erreur : Impossible de déclarer une indisponibilité pour une date passée !");
+            return;
+        }
+
+        // Chercher l'agent concerné
+        Agent agentCible = null;
+        List<Agent> listeAgent = tableAgent.allAgent();
+        for (Agent agent : listeAgent) {
+            if (agent.getIdAgent() == idAgent) {
+                agentCible = agent;
+                break;
             }
-            return true;
         }
 
-        //La methode Pour l'indisponibilité :
-        public void ajoutIndisponible(String motif, LocalDate date,int idAgent){
-            Indisponibilite ind = new Indisponibilite(idAgent,motif,date);
-            indisponibiliteList.add(ind);
+        if (agentCible == null) {
+            System.out.println("❌ Erreur : Agent non trouvé.");
+            return;
         }
 
+        // Ajouter l’indisponibilité
+        this.ajoutIndisponible(motif, date,idAgent);
+        System.out.println("✅ Indisponibilité ajoutée pour " + date);
 
-        //Pour methode pour signalerIndisponibilite des agents :
-        public void signalerIndisponibilite(String motif,int idAgent, LocalDate date,AdministrateurRH admin){
-            int i = 0;
-            for (Agent agent: admin.agentList){
-                if (agent.getIdAgent() == idAgent){
-                    agent.ajoutIndisponible(motif,date,idAgent);
-                    System.out.println("Indisponibilité ajoutée pour le " + date);
-
-                    admin.historiqueList.removeIf(historique -> historique.getDateRotation().isAfter(date.minusDays(1)));
-                    admin.positionActuelle = i;
-                    admin.planifierRotationAuto();
-                    break;
-                }
-                i++;
-            }
+        // On remet la position à l’agent concerné (s’il existe encore)
+        admin.positionActuelle = listeAgent.indexOf(agentCible)+1;
+        if (admin.positionActuelle > listeAgent.size() ) {
+            admin.positionActuelle = 0;
         }
 
-        // methode voir tour prochaine
-        public Historique voirTourProchaine(int idAgent,AdministrateurRH admin) {
-            for (Historique h: admin.historiqueList){
-                if (h.getIdAgent() == idAgent && h.getDateRotation().isAfter(LocalDate.now())){
-                    return h;
-                }
-            }
-            return null;
-        }
-        // methode voir historique
-    public void voirHistorique(int idAgent, AdministrateurRH admin) {
-        for (Historique h : admin.historiqueList) {
-            // Vérifie si l’agent est concerné (soit prévu, soit remplaçant)
-            boolean estConcerne = (h.getIdAgent() == idAgent && h.getIdAgentRemp() == 0) || h.getIdAgentRemp() == idAgent;
-
-            if (estConcerne) {
-                if (h.getDateRotation().isBefore(LocalDate.now())) {
-                    System.out.println("✅ Tu as servi le petit déjeuner le : " + h.getDateRotation());
-                } else {
-                    System.out.println("📅 Tu dois servir le petit déjeuner le : " + h.getDateRotation());
-                }
-                System.out.println("-------------------------------------------------------------------");
-            }
-            // sinon on n’affiche rien
-        }
+        // Replanifier uniquement les dates à venir
+        admin.planifierRotationAutoDepuis(date);
     }
 
 
 
+    // methode voir tour prochaine
+    public Historique voirTourProchaine(int idAgent,AdministrateurRH admin) {
+        List<Historique> historiqueList = new Historiques().allHistorique();
+        for (Historique h: historiqueList){
+            if (h.getIdAgent() == idAgent && (h.getDateRotation().isAfter(LocalDate.now())||h.getDateRotation().isEqual(LocalDate.now())) ){
+                return h;
+            }
+        }
+        return null;
+    }
+    // methode voir historique
+    public void voirHistorique(int idAgent,AdministrateurRH admin) {
+        List<Historique> historiqueList = new Historiques().allHistorique();
+        for (Historique h : historiqueList) {
+            if ( ((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isBefore(LocalDate.now()) ) ) {
+                System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
+                System.out.println("-------------------------------------------------------------------");
+            } else if (((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isAfter(LocalDate.now()) ) ) {
+                System.out.println("tu dois servir le petit dejeuner le : " + h.getDateRotation());
+                System.out.println("-------------------------------------------------------------------");
+            } else if (h.getIdAgentRemp() == idAgent){
+                System.out.println("tu as remplacé un agent le  : " + h.getDateRotation());
+                System.out.println("-------------------------------------------------------------------");
+            }
+        }
+    }
+
+
     //Methode pour le rappel et envoie de l'email:
 
-        public void rappelSiProcheTour(AdministrateurRH admin) {
-            LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
-            LocalDate demain = LocalDate.now().plusDays(1);
+    public void rappelSiProcheTour(AdministrateurRH admin) {
+        LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
+        LocalDate demain = LocalDate.now().plusDays(1);
 
-            ServiceMail mail = new ServiceMail();
-
-            for (Historique h : admin.historiqueList) {
-                if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(dansDeuxJours)) {
-                    mail.envoyerEmail(
-                            this.email,
-                            "📅 Rappel de votre tour DEJ",
-                            "Bonjour,\nVous êtes prévu pour offrir le petit-déjeuner dans 2 jours.\nMerci !"
-                    );
-                    System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
-                    return;
-                } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
-                    mail.envoyerEmail(
-                            this.email,
-                            "📅 Rappel de votre tour DEJ",
-                            "Bonjour,\nVous êtes prévu pour offrir le petit-déjeuner de damain.\nMerci !"
-                    );
-                    System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
-                    return;
-                }
+        for (Historique h : admin.historiqueList) {
+            if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(dansDeuxJours)) {
+                System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
+                return;
+            } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
+                System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
+                return;
+            }else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(LocalDate.now())) {
+                System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner Aujourd'hui");
+                return;
             }
-
-            // Aucun rappel
-            System.out.println("Aucun rappel pour vous aujourd’hui.");
         }
+
+        // Aucun rappel
+        System.out.println("Aucun rappel pour vous aujourd’hui.");
+    }
     }
 
 

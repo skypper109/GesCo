@@ -15,6 +15,7 @@ public class GestionAgent {
     public Users tableUser = new Users();
     private final AdministrateurRH admin;
     private final Scanner sc= new Scanner(System.in);
+    public ServiceMail service = new ServiceMail();
     public GestionAgent(AdministrateurRH admin){
         this.date = admin.getJourRotation();
         this.admin = admin;
@@ -58,32 +59,36 @@ public class GestionAgent {
         }
     }
 
-    private void pause(){
-        System.out.print("Appuyez sur Entrée pour continuer...");
-        sc.nextLine(); // vider éventuelle ligne précédente
-        sc.nextLine();
-    }
     private void ajoutAgent() {
-        System.out.print("Combien d’agents voulez-vous enregistrer ? : ");
+        System.out.print("🔹 Combien d’agents voulez-vous enregistrer ? : ");
         int nbAgent = sc.nextInt();
+        sc.nextLine();
         int nbrAgent = admin.agentList.size();
         for (int i = 0; i < nbAgent; i++) {
-            if (i!=0){
-                System.out.println("--------------------------------------------------------");
+            System.out.println("\n🧾 Agent #" + (i + 1));
+
+            System.out.print("👉 Prénom : ");
+            String prenom = sc.nextLine().trim();
+
+            System.out.print("👉 Nom : ");
+            String nom = sc.nextLine().trim();
+
+            System.out.print("📧 Email : ");
+            String email = sc.nextLine().trim().toLowerCase();
+
+            // Vérification email:
+            while (!admin.emailEstValide(email) || admin.emailExisteDeja(email)){
+                System.out.print("📧 Email : ");
+                email = sc.nextLine().trim().toLowerCase();
             }
-            System.out.print("Saisir le nom de l'agent " + (i + 1) + " : ");
-            sc.nextLine();
-            String nom = sc.nextLine();
-            System.out.print("Saisir le prenom de l'agent " + nom + " : ");
-            String prenom = sc.nextLine();
-            String email;
-            do{
-                System.out.print("Saisir l'email de l'agent " + nom +" " + prenom  + " : ");
-                email = sc.next();
-            }while (!admin.emailEstValide(email) || admin.emailExisteDeja(email));
+
             nbrAgent++;
             admin.ajoutAgent(nom,prenom,email);
+
+            System.out.println("✅ Agent ajouté : " + prenom + " " + nom);
+            service.envoyerEmail(email,"Creation de votre compte sur ANKA-DRAKAA","Votre compte a ete créer avec succes votre mot de passe est: agent1234 ");
         }
+
 
         System.out.println(nbAgent + (nbAgent > 1 ? " agents ont été ajoutés avec succès !" : " agent a été ajouté avec succès !"));
         System.out.println("Voulez vous faire une rotation Automatique en fonction de la date d'aujourd'hui (Oui/Non) ?");
@@ -116,13 +121,25 @@ public class GestionAgent {
 
 
     private void retireAgent() {
-        System.out.print("Entrez l'email de l'agent à retirer : ");
-        String valeur = sc.next();
-        if (admin.retireAgent(valeur)){
-            pause();
+        System.out.print("📧 Entrez l’email de l’agent à retirer : ");
+        sc.nextLine();
+        String email = sc.nextLine().trim().toLowerCase();
+        admin.emailEstValide(email);
+        if (admin.retireAgent(email)) {
+            System.out.println("✅ Agent retiré avec succès !");
         }else{
-            System.out.println("Email saisi est soit incorrect soit inexistant dans la base. Veillez Reassayez plus tard!");
+            System.out.println("❌ Aucun agent trouvé avec cet email.");
         }
+        pause();
+    }
+
+    // ajoutAgent() et listAgent() sont déjà améliorées
+    private void pause() {
+        System.out.println("\n\n");
+        System.out.print("🔁 Appuyez sur Entrée pour revenir au menu...");
+        sc.nextLine();
+        sc.nextLine();
     }
 
 }
+

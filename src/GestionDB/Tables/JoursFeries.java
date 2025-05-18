@@ -17,16 +17,17 @@ public class JoursFeries {
     public JoursFeries(){}
 
     //Pour l'ajout des jours feriés
-    public void addJourFerie(LocalDate date,String description){
+    public boolean addJourFerie(LocalDate date,String description){
         String insertJour = "INSERT INTO jourFeries(description,dateJourFerie) VALUES(?,?)";
         try(PreparedStatement prs = con.prepareStatement(insertJour)){
             prs.setString(1,description);
             prs.setDate(2, Date.valueOf(date));
             prs.executeUpdate();
-            System.out.println("La date ajouter avec succès !!!");
+            return true;
         }catch (SQLException e){
             System.out.println("Erreur lors de l'insertion de la date du jour ferié "+e.getMessage());
         }
+        return false;
     }
     public boolean delDateJourFerie(LocalDate date){
         String deleteJour = "DELETE FRON jourFeries WHERE dateJourFerie=?";
@@ -61,6 +62,19 @@ public class JoursFeries {
             System.out.println("Erreur lors de l'appel des dates des jours feriés !!! "+e.getMessage());
         }
         return null;
+    }
+
+    //Verifier si c'est dans la table jour Ferié :
+    public boolean estFerie(LocalDate date){
+        String sql = "SELECT * FROM jourFeries WHERE dateJourFerie=?";
+        try(PreparedStatement ptr = con.prepareStatement(sql)){
+            ptr.setDate(1, Date.valueOf(date));
+            var response = ptr.executeQuery();
+            return response.next();
+        }catch (SQLException e){
+            System.out.println("Erreur lors de la recuperation des dates d'indiponibiliter !!!");
+        }
+        return false;
     }
 
 }

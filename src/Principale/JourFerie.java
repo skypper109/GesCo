@@ -1,18 +1,22 @@
 package Principale;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 public class JourFerie {
-    private String description;
-    private LocalDate dateJourFerie;
+    private final String description;
+    private final LocalDate dateJourFerie;
 
     public JourFerie(LocalDate dateJourFerie, String description) {
         this.dateJourFerie = dateJourFerie;
         this.description = description;
     }
 
+
+
     public LocalDate getDateJourFerie() {
-        return dateJourFerie;
+
+        return this.dateJourFerie;
     }
 
     public String getDescription() {

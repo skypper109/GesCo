@@ -18,6 +18,11 @@ public class Connexion {
         }
     }
     public void initDB(){
+        //Pour la suppression de l"enselbles des tables :
+        String sql = "DROP TABLE IF EXISTS users";
+        String sql2 = "DROP TABLE IF EXISTS administrateurRHs";
+        String sql3 = "DROP TABLE IF EXISTS agents";
+        String dropTableHis = "DROP TABLE IF EXISTS historiques";
         String tableUser= """
                 CREATE TABLE IF NOT EXISTS users (
                     idUser INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +42,11 @@ public class Connexion {
         String tableAdministrateurRH = """
                 CREATE TABLE IF NOT EXISTS administrateurRHs(
                     idAdmin INTEGER PRIMARY KEY AUTOINCREMENT,
-                    jourRotation INTEGER
+                    nom TEXT NOT NULL,
+                    prenom TEXT NOT NULL,
+                    email TEXT UNIQUE DEFAULT "<admin@gmail.com>",
+                    password TEXT NOT NULL DEFAULT "<admin1234>",
+                    jourRotation INTEGER DEFAULT 5
                 );
                 """;
         String tableHistorique = """
@@ -47,9 +56,8 @@ public class Connexion {
                     agentPrevu INTEGER,
                     statut TEXT,
                     motif TEXT,
-                    agentRemplacant INTEGER,
-                    FOREIGN KEY (agentPrevu) REFERENCES agents(idAgent),
-                    FOREIGN KEY (agentRemplacant) REFERENCES agents(idAgent)
+                    agentRemplacant INTEGER DEFAULT 0,
+                    FOREIGN KEY (agentPrevu) REFERENCES agents(idAgent)
                 );
                 """;
         String tableFerier = """

@@ -48,4 +48,26 @@ public class Indisponibilites {
         }
         return null;
     }
+
+    //La liste des elements de la table :
+    public List<Indisponibilite> allIndisponibilite(){
+        String sql = "SELECT * FROM indisponibilites";
+        try (PreparedStatement ptr = con.prepareStatement(sql)){
+            var reponse = ptr.executeQuery();
+            List<Indisponibilite> indispo = new ArrayList<>();
+            while (reponse.next()){
+                Indisponibilite indis = new Indisponibilite(
+                        reponse.getInt("idAgent"),
+                        reponse.getString("motif"),
+                        reponse.getDate("dateIndisponible").toLocalDate()
+                );
+                indispo.add(indis);
+            }
+            return indispo;
+        }catch (Exception e){
+            System.out.println("Erreur lors de la recuperation des dates declarer indisponible");
+        }
+        return null;
+    }
+
 }

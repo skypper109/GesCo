@@ -24,7 +24,6 @@ public class Historiques extends Connexion {
             ptr.setString(4,motif);
             ptr.setInt(5,idAgentRempl);
             ptr.executeUpdate();
-            System.out.println("Ajout dans l'historique avec succes !!!");
         }catch (SQLException e){
             System.out.println("Erreur lors de l'insertion dans la table historique !!!");
         }
@@ -87,7 +86,6 @@ public class Historiques extends Connexion {
         try(PreparedStatement ptr=con.prepareStatement(commande)){
             ptr.setDate(1,date1);
             ptr.executeUpdate();
-            System.out.println("Les elements du futur dans la table historique effacer avec succes !!!!");
         }catch (SQLException e){
             System.out.println("Erreur lors des recuperation des elements dans la table historique!!!");
         }

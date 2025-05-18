@@ -43,7 +43,8 @@ public class User {
         this.email = email;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(String password,String email) {
+        User user = userTable.list(email,password);
         this.password = password;
     }
     public String getEmail(){

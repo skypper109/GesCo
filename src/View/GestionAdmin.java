@@ -10,21 +10,20 @@ import java.util.Scanner;
 public class GestionAdmin {
     private final Scanner sc = new Scanner(System.in);
     private final AdministrateurRH admin;
-
+    ServiceMail service = new ServiceMail();
     public GestionAdmin(AdministrateurRH admin) {
         this.admin = admin;
+        afficherMenu();
     }
 
     public void afficherMenu() {
         int choix = -1;
         while (choix != 0) {
-            System.out.println("\n=== MENU - GESTION DE ROTATION & JOURS ===");
+            System.out.println("\n=== MENU - GESTION DES JOURS ===");
             System.out.println("1. 📅 Afficher les agents avec leurs jours de rotation");
             System.out.println("2. 🔁 Changer le jour de rotation");
-            System.out.println("3. 📌 Lancer une nouvelle rotation");
-            System.out.println("4. 📖 Afficher les rotations a venir");
-            System.out.println("5. 🗓️ Ajouter un jour férié");
-            System.out.println("6. 📖 Voir les jours fériés enregistrés");
+            System.out.println("3. 🗓️ Ajouter un jour férié");
+            System.out.println("4. 📖 Voir les jours fériés enregistrés");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier("Choisissez une option : ");
@@ -32,10 +31,8 @@ public class GestionAdmin {
             switch (choix) {
                 case 1 -> afficherHistorique();
                 case 2 -> changerJourRotation();
-                case 3 -> planifierRotation();
-                case 4 -> afficherRotationAvenir();
-                case 5 -> ajouterJourFerie();
-                case 6 -> afficherJoursFeries();
+                case 3 -> ajouterJourFerie();
+                case 4 -> afficherJoursFeries();
                 case 0 -> System.out.println("Retour au menu principal...");
                 default -> System.out.println("❌ Option invalide. Essayez encore.");
             }
@@ -63,15 +60,7 @@ public class GestionAdmin {
         DayOfWeek nouveauJour = DayOfWeek.of(jour);
         admin.setJourRotation(nouveauJour);
         System.out.println("✅ Nouveau jour de rotation défini : " + nouveauJour);
-        admin.planifierRotationAuto();
-        pause();
-    }
-
-    private void planifierRotation() {
-        System.out.print("Entrez la date a laquelle commence la prochaine rotation (AAAA-MM-JJ) : ");
-        String dat =sc.next();
-        LocalDate date = LocalDate.parse(dat);
-        admin.planifieRotation(date);
+        admin.planifierRotationAutoDepuis(LocalDate.now());
         pause();
     }
 
@@ -84,6 +73,7 @@ public class GestionAdmin {
             String desc = sc.nextLine();
             admin.ajoutJourFerie(jourFerie,desc);
             System.out.println("✅ Jour férié ajouté : " + jourFerie + " C'est le jour de : "+desc);
+            admin.planifierRotationAutoDepuis(LocalDate.now());
         } catch (Exception e) {
             System.out.println("❌ Format de date invalide. Veuillez réessayer.");
         }
@@ -112,15 +102,10 @@ public class GestionAdmin {
         return valeur;
     }
 
-    private void afficherRotationAvenir(){
-        int saisi = lireEntier("Entrez le nombre de Semaines à venir dont vous voulez voir : ");
-        admin.afficherRotationAvenir(saisi);
-        this.pause();
-    }
-
+    //
     private void pause() {
-        System.out.print("Appuyez sur Entrée pour continuer...");
-        sc.nextLine(); // vider le buffer
+        System.out.println("\n\n");
+        System.out.print("🔁 Appuyez sur Entrée pour revenir au menu...");
         sc.nextLine();
     }
 
