@@ -35,7 +35,7 @@ public class EspaceAgent {
                 Historique tour = agentConnected.voirTourProchaine(agentID,admin);
                 if (tour!=null){
                     System.out.println("Votre prochain tour est prevu pour : "+ tour.getDateRotation());
-                    agentConnected.rappelSiProcheTour(admin);
+                    agentConnected.rappelSiProcheTour(agentID);
                 }else {
                     System.out.println("**********Vous n'avez pas de tour prevu pour l'instant.***********");
                 }

@@ -1,7 +1,15 @@
+package View;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
+import java.util.Properties;
+
 public class EmailService {
 
     private final String username = "colonel.diallo19@gmail.com";
-    private final String password = "smeo pdyg taaf vlir";
+    private final String password = "smeopdygtaafvlir";
     private Session createSession() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -16,7 +24,7 @@ public class EmailService {
         });
     }
 
-    public boolean envoyerEmail(String destinataire, String sujet, String contenu) {
+    public void envoyerEmail(String destinataire, String sujet, String contenu) {
         try {
             Message message = new MimeMessage(createSession());
             message.setFrom(new InternetAddress(username));
@@ -26,10 +34,8 @@ public class EmailService {
 
             Transport.send(message);
             System.out.println("✅ Email envoyé à : " + destinataire);
-            return true;
         } catch (MessagingException e) {
             System.out.println("❌ Erreur lors de l'envoi de l'email : " + e.getMessage());
-            return false;
         }
     }
 }

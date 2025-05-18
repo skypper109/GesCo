@@ -3,7 +3,7 @@ package Principale;
 import GestionDB.Tables.Agents;
 import GestionDB.Tables.Historiques;
 import GestionDB.Tables.Indisponibilites;
-import View.ServiceMail;
+import View.EmailService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -154,18 +154,19 @@ import java.util.List;
 
     //Methode pour le rappel et envoie de l'email:
 
-    public void rappelSiProcheTour(AdministrateurRH admin) {
+    public void rappelSiProcheTour(int idAgent) {
         LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
         LocalDate demain = LocalDate.now().plusDays(1);
+        List<Historique> historiqueList = new Historiques().allHistorique();
 
-        for (Historique h : admin.historiqueList) {
-            if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(dansDeuxJours)) {
+        for (Historique h : historiqueList) {
+            if (h.getIdAgent() == idAgent && h.getDateRotation().equals(dansDeuxJours)) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
                 return;
-            } else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(demain)) {
+            } else if (h.getIdAgent() == idAgent && h.getDateRotation().equals(demain)) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
                 return;
-            }else if (h.getIdAgent() == this.idAgent && h.getDateRotation().equals(LocalDate.now())) {
+            }else if (h.getIdAgent() == idAgent && h.getDateRotation().equals(LocalDate.now())) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner Aujourd'hui");
                 return;
             }

@@ -23,6 +23,9 @@ public class Connexion {
         String sql2 = "DROP TABLE IF EXISTS administrateurRHs";
         String sql3 = "DROP TABLE IF EXISTS agents";
         String dropTableHis = "DROP TABLE IF EXISTS historiques";
+        String dropTableJF = "DROP TABLE IF EXISTS jourFeries";
+        String dropTableInd = "DROP TABLE IF EXISTS indisponibilites";
+
         String tableUser= """
                 CREATE TABLE IF NOT EXISTS users (
                     idUser INTEGER PRIMARY KEY AUTOINCREMENT,

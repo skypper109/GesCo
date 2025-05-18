@@ -15,7 +15,7 @@ public class GestionAgent {
     public Users tableUser = new Users();
     private final AdministrateurRH admin;
     private final Scanner sc= new Scanner(System.in);
-    public ServiceMail service = new ServiceMail();
+    public EmailService service = new EmailService();
     public GestionAgent(AdministrateurRH admin){
         this.date = admin.getJourRotation();
         this.admin = admin;

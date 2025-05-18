@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class GestionAdmin {
     private final Scanner sc = new Scanner(System.in);
     private final AdministrateurRH admin;
-    ServiceMail service = new ServiceMail();
+    EmailService service = new EmailService();
     public GestionAdmin(AdministrateurRH admin) {
         this.admin = admin;
         afficherMenu();
