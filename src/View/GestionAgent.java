@@ -45,6 +45,7 @@ public class GestionAgent {
             System.out.println("1. ➕ Ajouter un agent");
             System.out.println("2. 📄 Lister les agents");
             System.out.println("3. 🗑️ Désactiver un agent");
+            System.out.println("4. 📄 Activer un agent");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier();
@@ -53,6 +54,8 @@ public class GestionAgent {
                 case 1 ->this.ajoutAgent();
                 case 2 -> this.listAgent();
                 case 3 -> this.retireAgent();
+                case 4 -> this.activerAgent();
+                case 5 -> this.resetMotDePasse();
                 case 0 -> System.out.println("Retour au menu principal...");
                 default -> System.out.println("❌ Option invalide. Essayez encore.");
             }
@@ -86,6 +89,8 @@ public class GestionAgent {
             nbrAgent++;
 
             System.out.println("✅ Agent ajouté : " + prenom + " " + nom);
+
+            System.out.print(" 👉 Veuillez patienter un instant ...");
             service.envoyerEmail(email,"Creation de votre compte sur ANKA-DRAKAA","Votre compte a ete créer avec succes votre mot de passe est: agent1234 ");
         }
 
@@ -102,31 +107,64 @@ public class GestionAgent {
     private void listAgent(){
         System.out.println("\nListe des agents :");
 
-        String leftAlignFormat = "| %-15s | %-15s | %-30s |%n";
-        String ligne = "+-----------------+-----------------+--------------------------------+";
+        String leftAlignFormat = "| %-25s | %-15s | %-35s | %-15s |%n";
+        String ligne = "+---------------------------+-----------------+-------------------------------------+-----------------+";
 
         System.out.println(ligne);
-        System.out.format(leftAlignFormat, "Prénom", "Nom", "Email");
+        System.out.format(leftAlignFormat, "Prénom", "Nom", "Email","Etat");
         System.out.println(ligne);
-        List<Agent> listAgent = tableAgent.allAgent();
+        List<Agent> listAgent = tableAgent.toutAgent();
         for (Agent ag :listAgent ) {
-            System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail());
+            String etat = ag.getEtat()==0 ?"Inactif":"Actif";
+            System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail(),etat);
             System.out.println(ligne);
         }
         this.pause();
     }
 
 
+    private void resetMotDePasse(){
+        String email = "";
+        do {
+            System.out.print("📧 Entrez l’email de l’agent à qui à perdu sont Mot de Passe : ");
+            sc.nextLine();
+            email = sc.nextLine().trim().toLowerCase();
+        }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
 
+        if (admin.reinitialiserPwd(email)) {
+            System.out.println("✅ !");
+        }else{
+            System.out.println("❌ Aucun agent trouvé avec cet email.");
+        }
+        pause();
+
+    }
 
 
     private void retireAgent() {
-        System.out.print("📧 Entrez l’email de l’agent à désactiver : ");
-        sc.nextLine();
-        String email = sc.nextLine().trim().toLowerCase();
-        admin.emailEstValide(email);
-        if (admin.retireAgent(email)) {
+        String email = "";
+        do {
+            System.out.print("📧 Entrez l’email de l’agent à désactiver : ");
+            sc.nextLine();
+            email = sc.nextLine().trim().toLowerCase();
+        }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
+        if (admin.desactiverAgent(email)) {
             System.out.println("✅ Agent désactivé avec succès !");
+        }else{
+            System.out.println("❌ Aucun agent trouvé avec cet email.");
+        }
+        pause();
+    }
+
+    private void activerAgent() {
+        String email = "";
+        do {
+            System.out.print("📧 Entrez l’email de l’agent qui est désactivé : ");
+            sc.nextLine();
+            email = sc.nextLine().trim().toLowerCase();
+        }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
+        if (admin.activerAgent(email)) {
+            System.out.println("✅ Agent activé avec succès !");
         }else{
             System.out.println("❌ Aucun agent trouvé avec cet email.");
         }

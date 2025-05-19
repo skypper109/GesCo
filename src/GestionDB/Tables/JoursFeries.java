@@ -46,7 +46,7 @@ public class JoursFeries {
 
     //Pour lister les jours feriés :
     public List<JourFerie> allJourFeries(){
-        String afficheJour = "SELECT * FROM jourFeries";
+        String afficheJour = "SELECT * FROM jourFeries ORDER BY dateJourFerie ASC";
         try(PreparedStatement pre = con.prepareStatement(afficheJour)){
             List<JourFerie> jouF = new ArrayList<>();
             var jourFerie = pre.executeQuery();
@@ -56,6 +56,22 @@ public class JoursFeries {
                         jourFerie.getString("description")
                 );
                 jouF.add(jf);
+            }
+            return jouF;
+        }catch (SQLException e){
+            System.out.println("Erreur lors de l'appel des dates des jours feriés !!! "+e.getMessage());
+        }
+        return null;
+    }
+
+    //Pour lister les jours feriés :
+    public List<LocalDate> allDateJourFeries(){
+        String afficheJour = "SELECT * FROM jourFeries";
+        try(PreparedStatement pre = con.prepareStatement(afficheJour)){
+            List<LocalDate> jouF = new ArrayList<>();
+            var jourFerie = pre.executeQuery();
+            while (jourFerie.next()){
+                jouF.add(jourFerie.getDate("dateJourFerie").toLocalDate());
             }
             return jouF;
         }catch (SQLException e){

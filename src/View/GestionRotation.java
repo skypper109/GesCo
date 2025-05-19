@@ -22,7 +22,7 @@ public class GestionRotation {
             System.out.println("\n========= ⚙️ MENU ROTATION  =========");
             System.out.println("1. 🚫 Signaler une indisponibilité et replanifier");
             System.out.println("2. 🔁 Lancer une rotation automatique maintenant");
-            System.out.println("3. 📌 Lancer une nouvelle rotation");
+            System.out.println("3. 📌 Planifier une nouvelle rotation dans le futur");
             System.out.println("4. 📖 Afficher les rotations a venir");
             System.out.println("5. 📜 Afficher l’historique");
             System.out.println("0. 🔙 Quitter le menu");
@@ -30,14 +30,19 @@ public class GestionRotation {
 
             switch (choix) {
                 case 1 -> {
-                    System.out.print("🆔 ID de l’agent : ");
-                    int id = sc.nextInt();
-                    sc.nextLine();
-                    System.out.print("📅 Date d’indisponibilité (aaaa-mm-jj) : ");
-                    LocalDate date = LocalDate.parse(sc.nextLine());
-                    System.out.print("✍️ Motif : ");
-                    String motif = sc.nextLine();
-                    admin.signalerIndisponibiliteAvecRotation(motif, id, date);
+                    try {
+                        System.out.print("🆔 Email de l’agent : ");
+                        String email = sc.nextLine();
+                        sc.nextLine();
+                        System.out.print("📅 Date d’indisponibilité (aaaa-mm-jj) : ");
+                        LocalDate date = LocalDate.parse(sc.nextLine());
+                        System.out.print("✍️ Motif : ");
+                        String motif = sc.nextLine();
+                        admin.signalerIndisponibiliteAvecRotation(motif, email, date);
+
+                    }catch (Exception e){
+                        System.out.println("❌ Format de date invalide. Veuillez réessayer.");
+                    }
                 }
                 case 2 -> admin.planifierRotationAuto();
                 case 3 -> this.planifierRotation();
@@ -71,7 +76,7 @@ public class GestionRotation {
 
     private void afficherRotationAvenir(){
         int saisi = lireEntier("Entrez le nombre de Semaines à venir dont vous voulez voir : ");
-        //admin.afficherRotationAvenir(saisi);
+        admin.afficherRotationAvenir(saisi);
         this.pause();
     }
 

@@ -27,7 +27,7 @@ public class EspaceAgent {
         List<Agent> listeAgent = new Agents().allAgent();
         List<Agent> connected = new ArrayList<>();
         int agentID = 0;
-
+        boolean rappel = false;
 
         for (Agent agent:listeAgent){
             if (agent.getEmail().equals(email)){
@@ -49,12 +49,6 @@ public class EspaceAgent {
                     }
 
                 }
-                List<Agent> agentCon = new Agents().getAgent(agentID);
-                if (agentCon.getFirst().getEtat()==0){
-                    System.out.println("-------------------[ Desolé votre compte est en etat Desactivé Veillez contacter l'Admin ]-----------------");
-                    pause();
-                    break;
-                }
                 connected.add(agent);
                 Agent agentConnected = new Agent(agentID,agent.getNom(),agent.getPrenom(), agent.getEmail());
 
@@ -62,7 +56,7 @@ public class EspaceAgent {
                 Historique tour = agentConnected.voirTourProchaine(agentID,admin);
                 if (tour!=null){
                     System.out.println("Votre prochain tour est prevu pour : "+ tour.getDateRotation());
-                    agentConnected.rappelSiProcheTour(agentID);
+                    rappel = agentConnected.rappelSiProcheTour(agentID);
                 }else {
                     System.out.println("**********Vous n'avez pas de tour prevu pour l'instant.***********");
                 }
@@ -72,6 +66,11 @@ public class EspaceAgent {
 
         int ch;
         do {
+            if (new Agents().getAgent(agentID)==0){
+                System.out.println("-------------------[ Desolé votre compte est en etat Desactivé Veillez contacter l'Admin ]-----------------");
+                pause();
+                break;
+            }
             System.out.println("\n========= 👤 MENU =========");
             System.out.println("1. 🚫 Signaler une indisponibilité");
             System.out.println("2. 📅 Voir mes prochaines rotations");
@@ -83,9 +82,25 @@ public class EspaceAgent {
                     break;
 
                 case 1:
+                    if (rappel){
+                        System.out.println("🚫🚫🚫 Impossible de signaler 🚫🚫🚫");
+                        break;
+                    }
 
+                    System.out.print("Voulez vous signaler pour la date en cours ?(Oui / Non) : ");
+                    String choix = sc.next();
+                    if (choix.equalsIgnoreCase("oui")){
+                        sc.nextLine();
+                        System.out.print("✍️ Motif : ");
+                        String motif = sc.nextLine();
+                        connected.getFirst().signalerIndisponibiliteEtReplanifier(motif,agentID,connected.getFirst().dateProche,admin);
+                        pause();
+                        break;
+                    }
+                    System.out.print("           Alors .....");
                     System.out.print("📆 Entrez la date d'indisponibilité (aaaa-mm-jj) : ");
                     try {
+                        sc.nextLine();
                         LocalDate date = LocalDate.parse(sc.nextLine());
                         System.out.print("✍️ Motif : ");
                         String motif = sc.nextLine();

@@ -1,6 +1,5 @@
 package Principale;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 public class JourFerie {
@@ -16,7 +15,22 @@ public class JourFerie {
 
     public LocalDate getDateJourFerie() {
 
-        return this.dateJourFerie;
+        return dateJourFerie;
+    }
+
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        JourFerie agent = (JourFerie) obj;
+        return dateJourFerie == agent.dateJourFerie;
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(dateJourFerie);
     }
 
     public String getDescription() {

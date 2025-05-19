@@ -127,13 +127,13 @@ import java.util.List;
         System.out.println("✅ Indisponibilité ajoutée pour " + date);
 
         // On remet la position à l’agent concerné (s’il existe encore)
-        admin.positionActuelle = listeAgent.indexOf(agentCible)+1;
+        /**admin.positionActuelle = listeAgent.indexOf(agentCible)+1;
         if (admin.positionActuelle > listeAgent.size() ) {
             admin.positionActuelle = 0;
-        }
+        }**/
 
         // Replanifier uniquement les dates à venir
-        admin.planifierRotationAutoDepuis(date);
+        admin.planifierRotationAuto();
     }
 
 
@@ -150,7 +150,7 @@ import java.util.List;
     }
     // methode voir historique
     public void voirHistorique(int idAgent,AdministrateurRH admin) {
-        List<Historique> historiqueList = new Historiques().allHistorique();
+        List<Historique> historiqueList = new Historiques().allHistorique().reversed();
         for (Historique h : historiqueList) {
             if ( ((h.getIdAgent() == idAgent && h.getIdAgentRemp()==0) &&  h.getDateRotation().isBefore(LocalDate.now()) ) ) {
                 System.out.println("tu as servie le petit dejeuner le : " + h.getDateRotation());
@@ -159,7 +159,7 @@ import java.util.List;
                 System.out.println("tu dois servir le petit dejeuner le : " + h.getDateRotation());
                 System.out.println("-------------------------------------------------------------------");
             } else if (h.getIdAgentRemp() == idAgent){
-                System.out.println("tu as remplacé un agent le  : " + h.getDateRotation());
+                System.out.println("tu as été remplacé par un autre agent le  : " + h.getDateRotation());
                 System.out.println("-------------------------------------------------------------------");
             }
         }
@@ -167,27 +167,28 @@ import java.util.List;
 
 
     //Methode pour le rappel et envoie de l'email:
-
-    public void rappelSiProcheTour(int idAgent) {
+    public LocalDate dateProche;
+    public boolean rappelSiProcheTour(int idAgent) {
         LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
         LocalDate demain = LocalDate.now().plusDays(1);
         List<Historique> historiqueList = new Historiques().allHistorique();
-
+        dateProche = historiqueList.getFirst().getDateRotation();
         for (Historique h : historiqueList) {
             if (h.getIdAgent() == idAgent && h.getDateRotation().equals(dansDeuxJours)) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner dans 2 jours (" + dansDeuxJours + ").");
-                return;
+                return true;
             } else if (h.getIdAgent() == idAgent && h.getDateRotation().equals(demain)) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner damain.");
-                return;
+                return true;
             }else if (h.getIdAgent() == idAgent && h.getDateRotation().equals(LocalDate.now())) {
                 System.out.println("\nRappel : Vous êtes prévu pour le petit-déjeuner Aujourd'hui");
-                return;
+                return true;
             }
         }
 
         // Aucun rappel
         System.out.println("Aucun rappel pour vous aujourd’hui.");
+        return false;
     }
     }
 

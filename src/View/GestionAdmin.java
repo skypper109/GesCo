@@ -20,19 +20,17 @@ public class GestionAdmin {
         int choix = -1;
         while (choix != 0) {
             System.out.println("\n=== MENU - GESTION DES JOURS ===");
-            System.out.println("1. 📅 Afficher les agents avec leurs jours de rotation");
-            System.out.println("2. 🔁 Changer le jour de rotation");
-            System.out.println("3. 🗓️ Ajouter un jour férié");
-            System.out.println("4. 📖 Voir les jours fériés enregistrés");
+            System.out.println("1. 🔁 Changer le jour de rotation");
+            System.out.println("2. 🗓️ Ajouter un jour férié");
+            System.out.println("3. 📖 Voir les jours fériés enregistrés");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier("Choisissez une option : ");
 
             switch (choix) {
-                case 1 -> afficherHistorique();
-                case 2 -> changerJourRotation();
-                case 3 -> ajouterJourFerie();
-                case 4 -> afficherJoursFeries();
+                case 1 -> changerJourRotation();
+                case 2 -> ajouterJourFerie();
+                case 3 -> afficherJoursFeries();
                 case 0 -> System.out.println("Retour au menu principal...");
                 default -> System.out.println("❌ Option invalide. Essayez encore.");
             }
@@ -60,16 +58,17 @@ public class GestionAdmin {
         DayOfWeek nouveauJour = DayOfWeek.of(jour);
         admin.setJourRotation(nouveauJour);
         System.out.println("✅ Nouveau jour de rotation défini : " + nouveauJour);
-        admin.planifierRotationAutoDepuis(LocalDate.now());
+        admin.planifierRotationAuto();
         pause();
     }
 
     private void ajouterJourFerie() {
-        System.out.print("Entrez la date du jour férié (AAAA-MM-JJ) : ");
-        String dateStr = sc.next();
         try {
+            System.out.print("Entrez la date du jour férié (AAAA-MM-JJ) : ");
+            String dateStr = sc.next();
             LocalDate jourFerie = LocalDate.parse(dateStr);
             System.out.print("Entrez le motif pour la date du jour férié ("+jourFerie+") : ");
+            sc.next();
             String desc = sc.nextLine();
             admin.ajoutJourFerie(jourFerie,desc);
             System.out.println("✅ Jour férié ajouté : " + jourFerie + " C'est le jour de : "+desc);

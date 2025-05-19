@@ -6,6 +6,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AdministrateurRH  extends User{
     private DayOfWeek jourRotation;
@@ -59,8 +60,9 @@ public class AdministrateurRH  extends User{
         System.out.println("Cet email est invalide. Veuillez Saisir un email valide");
         return false;
     }
+
     public boolean emailExisteDeja(String email) {
-        for (Agent agent : agentList) {
+        for (Agent agent : tableAgent.toutAgent()) {
             if (agent.getEmail().equalsIgnoreCase(email)) {
                 System.out.println("Cet email existe deja. Veuillez Saisir un autre");
                 return true;
@@ -68,6 +70,7 @@ public class AdministrateurRH  extends User{
         }
         return false;
     }
+
     public boolean ajoutAgent(String nom, String prenom, String email){
         if (emailEstValide(email) && !emailExisteDeja(email)){
             tableAgent.ajoutAgent(nom,prenom,email);
@@ -76,10 +79,16 @@ public class AdministrateurRH  extends User{
         }
         return false;
     }
-    //Pour retirer un agent
-    public boolean retireAgent(String email){
-        return tableAgent.delAgent(email);
+    //Pour Desactiver un agent
+    public boolean desactiverAgent(String email){
+        return tableAgent.desactiverAgent(email);
     }
+    //Pour Activer un agent
+    public boolean activerAgent(String email){
+        return tableAgent.activerAgent(email);
+    }
+    //Pour reinitialiser le mot de passe d'un agent :
+    public boolean reinitialiserPwd(String email){return tableAgent.changePwdAgent(email);}
     //Pour l'ajout des jours Fériés
     public void ajoutJourFerie(LocalDate date, String description){
         if (tableJourFerie.addJourFerie(date,description)){
@@ -95,7 +104,7 @@ public class AdministrateurRH  extends User{
             return;
         }
 
-        System.out.println("==============[\nListe des jours fériés enregistrés]===============");
+        System.out.println("==============[ Liste des jours fériés enregistrés ]===============");
 
         for (JourFerie date : jourFeries) {
             System.out.println("******* → " + date.getDateJourFerie()+" ****** Le jour de :  "+date.getDescription());
@@ -112,7 +121,7 @@ public class AdministrateurRH  extends User{
         List<JourFerie> jourFerieList = tableJourFerie.allJourFeries();
         for (JourFerie jourF:jourFerieList){
             if (jourF.getDateJourFerie().equals(date)){
-                date.plusWeeks(1);
+                date = date.plusWeeks(1);
                 break;
             }
         }
@@ -138,7 +147,7 @@ public class AdministrateurRH  extends User{
     }
 
     //Pour signaler une indisponibilité coté Admin :
-    public void signalerIndisponibiliteAvecRotation(String motif, int idAgent, LocalDate dateIndispo) {
+    public void signalerIndisponibiliteAvecRotation(String motif, String email, LocalDate dateIndispo) {
         if (dateIndispo.isBefore(LocalDate.now())) {
             System.out.println("❌ Vous ne pouvez pas signaler une indisponibilité dans le passé.");
             return;
@@ -147,7 +156,7 @@ public class AdministrateurRH  extends User{
         Agent agentCible = null;
         List<Agent> listeAgent = tableAgent.allAgent();
         for (Agent agent : listeAgent) {
-            if (agent.getIdAgent() == idAgent) {
+            if (agent.getEmail().equals(email)) {
                 agentCible = agent;
                 break;
             }
@@ -158,39 +167,37 @@ public class AdministrateurRH  extends User{
             return;
         }
 
+        tableIndisponibilite.addIndisponible(agentCible.getIdAgent(), motif, dateIndispo);
+        System.out.println("✅ Indisponibilité enregistrée pour le " + dateIndispo);
+
         // On remet la position à l’agent concerné (s’il existe encore)
         positionActuelle = listeAgent.indexOf(agentCible)+1;
         if (positionActuelle > listeAgent.size() ) {
             positionActuelle = 0;
+
         }
-
-        tableIndisponibilite.addIndisponible(idAgent, motif, dateIndispo);
-        System.out.println("✅ Indisponibilité enregistrée pour le " + dateIndispo);
-
         // On relance la planification à partir de cette date
-        planifierRotationAutoDepuis(dateIndispo);
+        planifierRotationAuto();
     }
 
     // Rotation automatique complète
     public void planifierRotationAuto() {
+        positionActuelle = 0;
         LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
 
-        //tableHistorique.deleteHistoriqueByDate(dateRotation.minusDays(1));
-        List<Historique> historiqueList = tableHistorique.allHistorique();
+        tableHistorique.deleteHistoriqueByDate(dateRotation);
         List<Agent> agentList = tableAgent.allAgent();
         List<Indisponibilite> indisponibiliteList = tableIndisponibilite.allIndisponibilite();
 
         List<Integer> agentsPlanifies = new ArrayList<>();
-        for (Historique h : historiqueList) {
-            agentsPlanifies.add(h.getIdAgent());
-        }
+        List<LocalDate> agentsPlanifiesDate = new ArrayList<>();
         int tentatives = 0;
         int totalAgents = agentList.size();
 
         while (agentsPlanifies.size() < totalAgents && tentatives < totalAgents * 2) {
             Agent agentPrevu = agentList.get(positionActuelle);
 
-            if (agentsPlanifies.contains(agentPrevu.getIdAgent())) {
+            if (agentsPlanifies.contains(agentPrevu.getIdAgent()) || agentsPlanifiesDate.contains(dateRotation)) {
                 positionActuelle = (positionActuelle + 1) % totalAgents;
                 tentatives++;
                 continue;
@@ -223,6 +230,7 @@ public class AdministrateurRH  extends User{
             tableHistorique.addHistorique(idAgent, dateRotation, statut, motif, idRemplacant);
 
             agentsPlanifies.add(idAgent);
+            agentsPlanifiesDate.add(dateRotation);
             positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
             dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
             tentatives++;
@@ -238,14 +246,20 @@ public class AdministrateurRH  extends User{
             return;
         }
 
-        tableHistorique.deleteHistoriqueByDate(dateDebut.minusDays(1));
+        tableHistorique.deleteHistoriqueByDate(dateDebut);
         List<Historique> historiqueList = tableHistorique.allHistorique();
         List<Agent> agentList = tableAgent.allAgent();
         List<Indisponibilite> indisponibiliteList = tableIndisponibilite.allIndisponibilite();
 
+
         List<Integer> agentsPlanifies = new ArrayList<>();
+        List<LocalDate> agentsPlanifiesDate = new ArrayList<>();
+
         for (Historique h : historiqueList) {
-            agentsPlanifies.add(h.getIdAgent());
+            if (h.getDateRotation().isAfter(LocalDate.now().minusDays(1))){
+                agentsPlanifies.add(h.getIdAgent());
+                agentsPlanifiesDate.add(h.getDateRotation());
+            }
         }
 
         LocalDate dateRotation = prochaineDateRotation(dateDebut);
@@ -255,7 +269,7 @@ public class AdministrateurRH  extends User{
         while (agentsPlanifies.size() < totalAgents && tentatives < totalAgents * 2) {
             Agent agentPrevu = agentList.get(positionActuelle);
 
-            if (agentsPlanifies.contains(agentPrevu.getIdAgent())) {
+            if (agentsPlanifies.contains(agentPrevu.getIdAgent()) && agentsPlanifiesDate.contains(dateRotation)) {
                 positionActuelle = (positionActuelle + 1) % totalAgents;
                 tentatives++;
                 continue;
@@ -282,7 +296,7 @@ public class AdministrateurRH  extends User{
                         motif = ind.getMotif();
                         idAgent = agentDisponible.getIdAgent();
                         position = true;
-                        positionActuelle = (agentList.indexOf(agentDisponible) + 2) % totalAgents;
+                        positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
                         break;
                     }
                 }
@@ -291,6 +305,7 @@ public class AdministrateurRH  extends User{
             tableHistorique.addHistorique(idAgent, dateRotation, statut, motif, idRemplacant);
 
             agentsPlanifies.add(idAgent);
+            agentsPlanifiesDate.add(dateRotation);
             if (!position){
                 positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
             }
@@ -303,7 +318,7 @@ public class AdministrateurRH  extends User{
 
     // Obtenir le nom complet d'un agent
     private String getNomParId(int id) {
-        for (Agent a : tableAgent.allAgent()) {
+        for (Agent a : tableAgent.toutAgent()) {
             if (a.getIdAgent() == id) {
                 return a.getPrenom() + " " + a.getNom();
             }
@@ -357,6 +372,62 @@ public class AdministrateurRH  extends User{
 
     }
 
+
+    public void afficherRotationAvenir(int nombreSemaines) {
+        List<Agent> agentList = tableAgent.allAgent();
+
+        List<Historique> historiqueList = tableHistorique.allHistorique();
+
+        if (agentList.isEmpty()) {
+            System.out.println("❌ Aucun agent disponible pour la rotation.");
+            return;
+        }
+
+        LocalDate dateRotation = prochaineDateRotation(LocalDate.now());
+        List<LocalDate> datesDejaPlanifiees = new ArrayList<>();
+        for (Historique h:historiqueList){
+            if (h.getDateRotation().isAfter(LocalDate.now())){
+                datesDejaPlanifiees.add(h.getDateRotation());
+            }
+        }
+
+        System.out.println("📅 Calendrier des rotations à venir (" + nombreSemaines + " semaines)");
+        System.out.println("---------------------------------------------------");
+
+        int rotationsAjoutees = 0;
+        int tentativeMax = nombreSemaines * 3;  // 🔐 Sécurité anti-boucle infinie
+
+        while (rotationsAjoutees < nombreSemaines && tentativeMax > 0) {
+            tentativeMax--;
+
+            // Sauter si la date est déjà utilisée
+            if (datesDejaPlanifiees.contains(dateRotation)) {
+                dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+                continue;
+            }
+
+            Agent agent = trouveAgentDisponible(dateRotation);
+            if (agent != null) {
+                System.out.printf("✅ Semaine du %s: %s %s (%s)%n",
+                        dateRotation,
+                        agent.getPrenom(),
+                        agent.getNom(),
+                        agent.getEmail()
+                );
+
+                positionActuelle = (agentList.indexOf(agent) + 1) % agentList.size();
+                rotationsAjoutees++;
+
+            } else {
+                System.out.printf("⚠️ Semaine du %s: Aucun agent disponible%n", dateRotation);
+            }
+
+            // Avancer la date quoiqu’il arrive
+            dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
+        }
+
+        System.out.println("---------------------------------------------------");
+    }
 
 }
 

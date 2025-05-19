@@ -81,7 +81,7 @@ public class Historiques extends Connexion {
     //Pour la suppression des elements en fonction d'une date precises :
     public void deleteHistoriqueByDate(LocalDate date){
         Date date1 = Date.valueOf(date);
-        String commande = "DELETE FROM historiques WHERE dateRotation > ?";
+        String commande = "DELETE FROM historiques WHERE dateRotation >= ?";
 
         try(PreparedStatement ptr=con.prepareStatement(commande)){
             ptr.setDate(1,date1);
