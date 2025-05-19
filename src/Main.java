@@ -22,7 +22,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         // 1. Affichage d'accueil avec logo DEJ
         new Accueil().accueil();
-        //new Connexion().initDB();
+        new Connexion().initDB();
         /**List<Historique> listHistorique = new Historiques().allHistorique();
         if (listHistorique!=null){
 

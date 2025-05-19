@@ -21,7 +21,6 @@ public class AdministrateurRHs {
             stmt.setString(4,password);
             stmt.setInt(5,jourRotation);
             stmt.executeUpdate();
-            System.out.println("Ajout dans la table AdministrateurRHs avec succes !!!");
         }catch (Exception e){
             System.out.println("Erreur lors de l'ajout dans la table AdministrateurRHs !!!");
         }
@@ -34,7 +33,6 @@ public class AdministrateurRHs {
             stmt.setString(1,mdp);
             stmt.setString(2,email);
             stmt.executeUpdate();
-            System.out.println("Modification du mot de passe avec succes !!!");
         }catch (Exception e){
             System.out.println("Erreur lors de la modification du mot de passe dans la table AdministrateurRHs !!!");
         }
