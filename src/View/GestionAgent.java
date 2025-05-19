@@ -68,14 +68,29 @@ public class GestionAgent {
         int nbAgent = sc.nextInt();
         sc.nextLine();
         int nbrAgent = admin.agentList.size();
-        for (int i = 0; i < nbAgent; i++) {
-            System.out.println("\n🧾 Agent #" + (i + 1));
+        for (int i = 1; i <= nbAgent; i++) {
+            System.out.println("\n🧾 Agent #" + (i));
 
             System.out.print("👉 Prénom : ");
             String prenom = sc.nextLine().trim();
 
+            // Vérification email:
+            while (prenom.isBlank()){
+                System.out.println("Ressaisi le prenom !");
+                System.out.print("👉 Prénom : ");
+                prenom = sc.nextLine().trim();
+            }
+
+
             System.out.print("👉 Nom : ");
             String nom = sc.nextLine().trim();
+
+            // Vérification email:
+            while (nom.isBlank()){
+                System.out.println("Ressaisi le nom !");
+                System.out.print("👉 Nom : ");
+                nom = sc.nextLine().trim();
+            }
 
             System.out.print("📧 Email : ");
             String email = sc.nextLine().trim().toLowerCase();
