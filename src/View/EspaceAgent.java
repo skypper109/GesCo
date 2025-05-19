@@ -86,7 +86,7 @@ public class EspaceAgent {
                         System.out.println("🚫🚫🚫 Impossible de signaler 🚫🚫🚫");
                         break;
                     }
-
+                    /**
                     System.out.print("Voulez vous signaler pour la date en cours ?(Oui / Non) : ");
                     String choix = sc.next();
                     if (choix.equalsIgnoreCase("oui")){
@@ -97,7 +97,7 @@ public class EspaceAgent {
                         pause();
                         break;
                     }
-                    System.out.print("           Alors .....");
+                    System.out.print("           Alors .....");**/
                     System.out.print("📆 Entrez la date d'indisponibilité (aaaa-mm-jj) : ");
                     try {
                         sc.nextLine();
@@ -108,6 +108,7 @@ public class EspaceAgent {
                         pause();
                         break;
                     } catch (Exception e) {
+                        System.out.println("⚠️ Format de date invalide ⚠️ ");
                         break;
                     }
                 case 2:

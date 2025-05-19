@@ -139,7 +139,8 @@ public class GestionAgent {
         }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
 
         if (admin.reinitialiserPwd(email)) {
-            System.out.println("✅ !");
+            System.out.println("Chargement ....");
+            new EmailService().envoyerEmail(email,"Reinitialisation de Mot de Passe","Le mot de passe de votre compte a ete reinitialiser avec succes votre mot de passe est: agent1234 ");
         }else{
             System.out.println("❌ Aucun agent trouvé avec cet email.");
         }
@@ -169,9 +170,11 @@ public class GestionAgent {
             System.out.print("📧 Entrez l’email de l’agent qui est désactivé : ");
             sc.nextLine();
             email = sc.nextLine().trim().toLowerCase();
-        }while (!admin.emailEstValide(email));
+        }while(!admin.emailEstValide(email));
         if (admin.activerAgent(email)) {
             System.out.println("✅ Agent activé avec succès !");
+            System.out.println("Chargement ....");
+            service.envoyerEmail(email,"Activation de votre compte sur ANKA-DRAKAA","Votre compte a ete activer avec succes. Maintenant vous pouvez vous vous connecter pour voir votre prochain tour avec votre identifiant");
         }else{
             System.out.println("❌ Aucun agent trouvé avec cet email.");
         }

@@ -36,9 +36,7 @@ public class Authentification {
                         System.out.println("2. 🗓️ Gestion Des Jours ");
                         System.out.println("3. 📋 Gestion De Rotation ");
                         System.out.println("0. ❌ Se deconnecter");
-                        System.out.print("Votre choix : ");
-                        choix = sc.nextInt();
-                        sc.nextLine();
+                        choix = lireEntier("Votre choix : ");
                         if (choix==1){
                             new GestionAgent(admin);
                         } else if (choix == 2) {
@@ -62,5 +60,22 @@ public class Authentification {
         } else {
             System.out.println("❌ Identifiants incorrects. Réessayez.");
         }
+    }
+
+    public int lireEntier(String message) {
+        int valeur = -1;
+        boolean valide = false;
+
+        while (!valide) {
+            System.out.print(message);
+            try {
+                valeur = sc.nextInt();
+                valide = true;
+            } catch (InputMismatchException e) {
+                System.out.println("⚠️ Entrez un nombre valide.");
+                sc.next(); // nettoyer la mauvaise saisie
+            }
+        }
+        return valeur;
     }
 }
