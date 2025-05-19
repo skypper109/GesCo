@@ -62,6 +62,9 @@ public class AdministrateurRH  extends User{
     }
 
     public boolean emailExisteDeja(String email) {
+        if (tableAgent.toutAgent()==null){
+            return false;
+        }
         for (Agent agent : tableAgent.toutAgent()) {
             if (agent.getEmail().equalsIgnoreCase(email)) {
                 System.out.println("Cet email existe deja. Veuillez Saisir un autre");
@@ -119,6 +122,10 @@ public class AdministrateurRH  extends User{
         LocalDate date = ref.with(TemporalAdjusters.nextOrSame(DayOfWeek.of(jour)));
 
         List<JourFerie> jourFerieList = tableJourFerie.allJourFeries();
+
+        if (jourFerieList==null){
+            return date;
+        }
         for (JourFerie jourF:jourFerieList){
             if (jourF.getDateJourFerie().equals(date)){
                 date = date.plusWeeks(1);

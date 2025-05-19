@@ -114,6 +114,12 @@ public class GestionAgent {
         System.out.format(leftAlignFormat, "Prénom", "Nom", "Email","Etat");
         System.out.println(ligne);
         List<Agent> listAgent = tableAgent.toutAgent();
+
+        if (listAgent==null || listAgent.isEmpty()) {
+            System.out.println("❌ Aucun agent disponible pour l'instant.");
+            return;
+        }
+
         for (Agent ag :listAgent ) {
             String etat = ag.getEtat()==0 ?"Inactif":"Actif";
             System.out.format(leftAlignFormat, ag.getPrenom(), ag.getNom(), ag.getEmail(),etat);

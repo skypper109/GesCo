@@ -81,12 +81,6 @@ public class Connexion {
                 );
                 """;
         try(Connection con = connect(); Statement stmt = con.createStatement()) {
-            stmt.execute(sql);
-            stmt.execute(sql2);
-            stmt.execute(sql3);
-            stmt.execute(dropTableHis);
-            stmt.execute(dropTableJF);
-            stmt.execute(dropTableInd);
             stmt.execute(tableAgent);
             stmt.execute(tableAdministrateurRH);
             stmt.execute(tableUser);
