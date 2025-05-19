@@ -46,6 +46,7 @@ public class GestionAgent {
             System.out.println("2. 📄 Lister les agents");
             System.out.println("3. 🗑️ Désactiver un agent");
             System.out.println("4. 📄 Activer un agent");
+            System.out.println("5. 🗑️ Reinitialiser le Mot de passe d'un agent");
             System.out.println("0. 🔙 Retour au menu principal");
 
             choix = lireEntier();
@@ -132,8 +133,8 @@ public class GestionAgent {
     private void resetMotDePasse(){
         String email = "";
         do {
-            System.out.print("📧 Entrez l’email de l’agent à qui à perdu sont Mot de Passe : ");
             sc.nextLine();
+            System.out.print("📧 Entrez l’email de l’agent à qui à perdu sont Mot de Passe : ");
             email = sc.nextLine().trim().toLowerCase();
         }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
 
@@ -168,7 +169,7 @@ public class GestionAgent {
             System.out.print("📧 Entrez l’email de l’agent qui est désactivé : ");
             sc.nextLine();
             email = sc.nextLine().trim().toLowerCase();
-        }while (!admin.emailEstValide(email) || !admin.emailExisteDeja(email));
+        }while (!admin.emailEstValide(email));
         if (admin.activerAgent(email)) {
             System.out.println("✅ Agent activé avec succès !");
         }else{

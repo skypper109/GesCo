@@ -20,8 +20,8 @@ public class GestionRotation {
         int choix;
         do {
             System.out.println("\n========= ⚙️ MENU ROTATION  =========");
-            System.out.println("1. 🚫 Signaler une indisponibilité et replanifier");
-            System.out.println("2. 🔁 Lancer une rotation automatique maintenant");
+            System.out.println("1. 🚫 Signaler une indisponibilité pour un agent");
+            System.out.println("2. 🔁 Actualiser la rotation automatique ");
             System.out.println("3. 📌 Planifier une nouvelle rotation dans le futur");
             System.out.println("4. 📖 Afficher les rotations a venir");
             System.out.println("5. 📜 Afficher l’historique");
