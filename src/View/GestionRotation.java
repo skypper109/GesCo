@@ -32,9 +32,10 @@ public class GestionRotation {
                 case 1 -> {
                     try {
                         System.out.print("🆔 Email de l’agent : ");
+                        sc.nextLine(); //Pour vider le scanner.
                         String email = sc.nextLine();
-                        sc.nextLine();
                         System.out.print("📅 Date d’indisponibilité (aaaa-mm-jj) : ");
+
                         LocalDate date = LocalDate.parse(sc.nextLine());
                         System.out.print("✍️ Motif : ");
                         String motif = sc.nextLine();
