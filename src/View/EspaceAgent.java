@@ -82,22 +82,30 @@ public class EspaceAgent {
                     break;
 
                 case 1:
+                    Historique tour = connected.getFirst().voirTourProchaine(agentID,admin);
+                    if (tour==null){
+                        System.out.println("🚫🚫🚫 Impossible de signaler Vous n'avez pas de tour prevu 🚫🚫🚫");
+                        break;
+                    }
                     if (rappel){
                         System.out.println("🚫🚫🚫 Impossible de signaler 🚫🚫🚫");
                         break;
                     }
-                    /**
+
                     System.out.print("Voulez vous signaler pour la date en cours ?(Oui / Non) : ");
                     String choix = sc.next();
                     if (choix.equalsIgnoreCase("oui")){
                         sc.nextLine();
                         System.out.print("✍️ Motif : ");
                         String motif = sc.nextLine();
-                        connected.getFirst().signalerIndisponibiliteEtReplanifier(motif,agentID,connected.getFirst().dateProche,admin);
+                        if (motif.isBlank()){
+                            motif = "Pas de motif";
+                        }
+                        connected.getFirst().signalerIndisponibiliteEtReplanifier(motif,agentID,tour.getDateRotation(),admin);
                         pause();
                         break;
                     }
-                    System.out.print("           Alors .....");**/
+                    System.out.print("           Alors .....");
                     System.out.print("📆 Entrez la date d'indisponibilité (aaaa-mm-jj) : ");
                     try {
                         sc.nextLine();
