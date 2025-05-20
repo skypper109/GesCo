@@ -246,83 +246,56 @@ public class AdministrateurRH  extends User{
         System.out.println("✅ Rotation actualiser avec succès !!");
     }
 
-    // Planifie rotation à partir d'une date (ex : après indispo)
+   
+    // Planifie une nouvelle rotation complète à partir d’une date future
     public void planifierRotationAutoDepuis(LocalDate dateDebut) {
         if (dateDebut.isBefore(LocalDate.now())) {
             System.out.println("⚠️ La date de rotation ne peut pas être antérieure à aujourd’hui.");
             return;
         }
 
-        tableHistorique.deleteHistoriqueByDate(dateDebut);
-        List<Historique> historiqueList = tableHistorique.allHistorique();
         List<Agent> agentList = tableAgent.allAgent();
         List<Indisponibilite> indisponibiliteList = tableIndisponibilite.allIndisponibilite();
 
-
-        List<Integer> agentsPlanifies = new ArrayList<>();
-        List<LocalDate> agentsPlanifiesDate = new ArrayList<>();
-
-        for (Historique h : historiqueList) {
-            if (h.getDateRotation().isAfter(LocalDate.now().minusDays(1))){
-                agentsPlanifies.add(h.getIdAgent());
-                agentsPlanifiesDate.add(h.getDateRotation());
-            }
-        }
-
+        // Début de la planification
         LocalDate dateRotation = prochaineDateRotation(dateDebut);
-        int tentatives = 0;
-        int totalAgents = agentList.size();
+        int rotationsAjoutees = 0;
 
-        while (agentsPlanifies.size() < totalAgents && tentatives < totalAgents * 2) {
+        while (rotationsAjoutees < agentList.size()) {
             Agent agentPrevu = agentList.get(positionActuelle);
-
-            if (agentsPlanifies.contains(agentPrevu.getIdAgent()) && agentsPlanifiesDate.contains(dateRotation)) {
-                positionActuelle = (positionActuelle + 1) % totalAgents;
-                tentatives++;
-                continue;
-            }
-
             Agent agentDisponible = trouveAgentDisponible(dateRotation);
-            int idAgent = agentPrevu.getIdAgent();
 
             if (agentDisponible == null) {
                 System.out.println("❌ Aucun agent disponible pour la date " + dateRotation);
                 break;
             }
 
-            boolean memePersonne = agentPrevu.equals(agentDisponible);
+            boolean memeAgent = agentPrevu.equals(agentDisponible);
+            String statut = memeAgent ? "En cours" : "Indisponible";
+            int idRemplacant = memeAgent ? 0 : agentDisponible.getIdAgent();
+            int idEffectif = memeAgent ? agentPrevu.getIdAgent() : agentDisponible.getIdAgent();
 
-            String statut = memePersonne ? "En cours" : "Indisponible";
-            int idRemplacant = memePersonne ? 0 :  agentPrevu.getIdAgent();
-
+            // Motif s’il y a remplacement
             String motif = null;
-            boolean position = false;
-            if (!memePersonne) {
+            if (!memeAgent) {
                 for (Indisponibilite ind : indisponibiliteList) {
-                    if (ind.getDateIndisponible().equals(dateRotation)) {
+                    if (ind.getDateIndisponible().equals(dateRotation) && ind.getId() == agentPrevu.getIdAgent()) {
                         motif = ind.getMotif();
-                        idAgent = agentDisponible.getIdAgent();
-                        position = true;
-                        positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
                         break;
                     }
                 }
             }
 
-            tableHistorique.addHistorique(idAgent, dateRotation, statut, motif, idRemplacant);
+            tableHistorique.addHistorique(idEffectif, dateRotation, statut, motif, idRemplacant);
 
-            agentsPlanifies.add(idAgent);
-            agentsPlanifiesDate.add(dateRotation);
-            if (!position){
-                positionActuelle = (agentList.indexOf(agentDisponible) + 1) % totalAgents;
-            }
+            // Marquer comme fait et passer au suivant
+            positionActuelle = (agentList.indexOf(agentDisponible) + 1) % agentList.size();
             dateRotation = prochaineDateRotation(dateRotation.plusDays(1));
-            tentatives++;
+            rotationsAjoutees++;
         }
 
         System.out.println("✅ Nouvelle rotation planifiée à partir de " + dateDebut);
     }
-
     // Obtenir le nom complet d'un agent
     private String getNomParId(int id) {
         for (Agent a : tableAgent.toutAgent()) {
