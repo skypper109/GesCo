@@ -68,7 +68,7 @@ public class GestionAdmin {
             String dateStr = sc.next();
             LocalDate jourFerie = LocalDate.parse(dateStr);
             System.out.print("Entrez le motif pour la date du jour férié ("+jourFerie+") : ");
-            sc.next();
+            sc.nextLine();
             String desc = sc.nextLine();
             admin.ajoutJourFerie(jourFerie,desc);
             System.out.println("✅ Jour férié ajouté : " + jourFerie + " C'est le jour de : "+desc);
